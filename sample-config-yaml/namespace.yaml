@@ -1,8 +1,8 @@
 kind: wcpNamespace
 metadata:
   vcenter: pacific-vcsa.haas-270.pez.pivotal.io
-  datacenter: Pacific-Datacenter                        # DO NOT MODIFY
-  cluster: Workload-Cluster                             # DO NOT MODIFY
+  datacenter: Pacific-Datacenter                        
+  cluster: Workload-Cluster                             
 spec:
   namespace: demonamespace1
   Description: 'Demo NS 1'
@@ -28,8 +28,8 @@ spec:
 kind: wcpNamespace
 metadata:
   vcenter: pacific-vcsa.haas-270.pez.pivotal.io
-  datacenter: Pacific-Datacenter                        # DO NOT MODIFY
-  cluster: Workload-Cluster                             # DO NOT MODIFY
+  datacenter: Pacific-Datacenter                        
+  cluster: Workload-Cluster                             
 spec:
   namespace: demonamespace2
   Description: 'Demo NS 2'
