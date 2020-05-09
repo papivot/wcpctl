@@ -33,12 +33,13 @@ vSPhere 7 with Kubernetes brings some amazing features that enable you to run K8
 * Execute the `wcpctl` code.
 
 ```
-python3 wcpctl.py -h                                                                                    ✔  10182  19:55:49
+$ python3 wcpctl.py -h  
+=============================================================================
 usage: wcpctl.py [-h] [-u USERID] [--version] verb filename
 
 wcpctl controls for managing Supervisor Clusters in vSphere 7 with K8s. Uses
 YAML configuration files to setup and manage the Supervisor Cluster. For
-additionalinformation at: https://github.io/papivot/wcpctl
+additional information go to https://github.io/papivot/wcpctl
 
 positional arguments:
   verb        Provide action to perform. Currently supports
