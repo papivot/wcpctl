@@ -1,5 +1,5 @@
 # WCPCTL
-## A `kubectl` like commandline tool to interact with vSPhere 7 with Kubernetes Supervisor Cluster.
+## A `kubectl` like commandline tool to interact with vSphere 7 with Kubernetes Supervisor Cluster.
 
 ---
 
@@ -9,3 +9,17 @@ vSPhere 7 with Kubernetes brings some amazing features that enable you to run K8
 
 * Language - Python (tested on v3.7, MacOS and Linux)
 * Required modules - requests, json, time, yaml, uuid, argparse, getpass
+
+---
+
+Currently the following actions are supported - 
+* Creation of the Supervisor Cluster
+* Creation of Namespaces
+* Creation of Harbor registry (WIP)
+* Reconfiguration of Namespaces
+* Deletion of Namespaces
+* Deletion of Harbor registry (WIP)
+* Deletion of Supervisor cluster
+
+---
+
