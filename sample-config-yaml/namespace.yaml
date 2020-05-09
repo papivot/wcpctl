@@ -1,1 +1,53 @@
+kind: wcpNamespace
+metadata:
+  vcenter: pacific-vcsa.haas-270.pez.pivotal.io
+  datacenter: Pacific-Datacenter                        # DO NOT MODIFY
+  cluster: Workload-Cluster                             # DO NOT MODIFY
+spec:
+  namespace: demonamespace1
+  Description: 'Demo NS 1'
+  access_list:
+  - role: EDIT
+    subject_type: USER
+    subject: Administrator
+    domain: vsphere.local
+# To add additional users, create the users in VCenter and uncomment the section below
+# - role: VIEW
+#   subject_type: USER
+#   subject: user1
+#   domain: vsphere.local
+  storage_specs:
+  - limit: 200
+    policy: pacific-gold-storage-policy
+  resource_spec:
+#   Resources ot implemented yet
+#   cpu_limit: 1
+#   memory_limit: 1
+#   storage_request_limit: 1
 ---
+kind: wcpNamespace
+metadata:
+  vcenter: pacific-vcsa.haas-270.pez.pivotal.io
+  datacenter: Pacific-Datacenter                        # DO NOT MODIFY
+  cluster: Workload-Cluster                             # DO NOT MODIFY
+spec:
+  namespace: demonamespace2
+  Description: 'Demo NS 2'
+  access_list:
+  - role: EDIT
+    subject_type: USER
+    subject: Administrator
+    domain: vsphere.local
+# To add additional users, create the users in VCenter and uncomment the section below
+# - role: VIEW
+#   subject_type: USER
+#   subject: user1
+#   domain: vsphere.local
+  storage_specs:
+  - limit: 200
+    policy: pacific-gold-storage-policy
+  resource_spec:
+#   Resources ot implemented yet
+#   cpu_limit: 1
+#   memory_limit: 1
+#   storage_request_limit: 1
