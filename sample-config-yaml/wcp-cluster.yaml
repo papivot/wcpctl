@@ -1,0 +1,48 @@
+---
+kind: wcpCluster
+metadata:
+  vcenter: pacific-vcsa.haas-270.pez.pivotal.io
+  datacenter: Pacific-Datacenter                        
+  cluster: Workload-Cluster                             Y
+spec:
+  ncp_cluster_network_spec:
+    nsx_edge_cluster:                                   # LEAVE BLANK
+    cluster_distributed_switch:                         # LEAVE BLANK
+    egress_cidrs:
+    - address: 110.193.222.128
+      prefix: 26                                        
+    ingress_cidrs:
+    - address: 10.193.222.64
+      prefix: 26                                        
+    pod_cidrs:
+    - address: 10.244.0.0                               
+      prefix: 21                                        
+  service_cidr:
+    address: 10.96.0.0                                  
+    prefix: 24                                          
+  worker_DNS:
+  - 10.192.2.10                                         
+  master_DNS:
+  - 10.192.2.10                                         
+  master_DNS_search_domains:
+  - haas-270.pez.pivotal.io
+  master_NTP_servers:
+  - 10.192.2.5                                          
+  Master_DNS_names:
+  - wcp.haas-270.pez.pivotal.io
+  master_management_network:
+    address_range:
+      gateway: 10.193.222.1
+      starting_address: 10.193.222.45
+      subnet_mask: 255.255.255.0                        
+      address_count: 5                                  
+    mode: STATICRANGE                                   
+    network: "DVPG-Management Network"                  
+  ephemeral_storage_policy: pacific-gold-storage-policy 
+  image_storage:
+    storage_policy: pacific-gold-storage-policy         
+  master_storage_policy: pacific-gold-storage-policy    
+  network_provider: NSXT_CONTAINER_PLUGIN               
+  size_hint: TINY
+  login_banner:
+  default_kubernetes_service_content_library: Kubernetes 
