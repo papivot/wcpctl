@@ -12,7 +12,7 @@ vSPhere 7 with Kubernetes brings some amazing features that enable you to run K8
 
 ---
 
-Currently the following actions are supported - 
+### Currently the following actions are supported - 
 * Creation of the Supervisor Cluster
 * Creation of Namespaces
 * Creation of Harbor registry (WIP)
@@ -22,4 +22,11 @@ Currently the following actions are supported -
 * Deletion of Supervisor cluster
 
 ---
+
+### Setup 
+* Make sure Python3 is installed and working.
+* Make sure the modules listed above are installed. May require pip3 to install.
+* Make sure you have admin access to the vCenter server.
+* Make sure the workstation where the `wcpctl` cli will run on has access to the VCenter server. 
+
 
