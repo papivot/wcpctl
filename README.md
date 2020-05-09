@@ -28,5 +28,28 @@ vSPhere 7 with Kubernetes brings some amazing features that enable you to run K8
 * Make sure the modules listed above are installed. May require pip3 to install.
 * Make sure you have admin access to the vCenter server.
 * Make sure the workstation where the `wcpctl` cli will run on has access to the VCenter server. 
+* Clone this repo. 
+* Modify the YAML config files provided in the sample folder. 
+* Execute the `wcpctl` code.
+
+```
+python3 wcpctl.py -h                                                                                    ✔  10182  19:55:49
+usage: wcpctl.py [-h] [-u USERID] [--version] verb filename
+
+wcpctl controls for managing Supervisor Clusters in vSphere 7 with K8s. Uses
+YAML configuration files to setup and manage the Supervisor Cluster. For
+additionalinformation at: https://github.io/papivot/wcpctl
+
+positional arguments:
+  verb        Provide action to perform. Currently supports
+              create/apply/delete
+  filename    yaml file with WCP configuration. See examples for help
+
+optional arguments:
+  -h, --help  show this help message and exit
+  -u USERID   VCenter userid. If not provided, will default to
+              administrator@vsphere.local
+  --version   show program's version number and exit
+```
 
 
