@@ -16,7 +16,7 @@ Currently the following actions are supported -
 * Creation of the Supervisor Cluster
 * Creation of Namespaces
 * Creation of Harbor registry (WIP)
-* Reconfiguration of Namespaces
+* Reconfiguration of Namespaces (Resource config is a WIP)
 * Deletion of Namespaces
 * Deletion of Harbor registry (WIP)
 * Deletion of Supervisor cluster
