@@ -29,15 +29,6 @@ else:
 
 password = getpass.getpass(prompt='Password: ')
 
-########### Enable for debugging
-############
-#verb = "create"
-#verb = "delete"
-#verb = "apply"
-#filename = 'wcpall-haas.yaml'
-#userid = "administrator@vsphere.local"
-#password = "VMware1!"
-
 def generate_random_uuid():
     return str(uuid.uuid4())
 
