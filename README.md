@@ -7,4 +7,5 @@ vSPhere 7 with Kubernetes brings some amazing features that enable you to run K8
 
 ---
 
-* Language - Python (`tested on v3.7`, MacOS and Linux)
+* Language - Python (tested on v3.7, MacOS and Linux)
+* Required modules - requests, json, time, yaml, uuid, argparse, getpass
