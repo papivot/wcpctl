@@ -20,6 +20,11 @@ vSPhere 7 with Kubernetes brings some amazing features that enable you to run K8
 * Deletion of Namespaces
 * Deletion of Harbor registry (WIP)
 * Deletion of Supervisor cluster
+* Describe Namespace(s) (JSON output)
+* Describe WCP Registry (JSON output)
+* Describe WCP Cluster (JSON output)
+
+
 
 ---
 
@@ -36,22 +41,24 @@ vSPhere 7 with Kubernetes brings some amazing features that enable you to run K8
 $ python3 wcpctl.py -h  
 =============================================================================
 
-usage: wcpctl.py [-h] [-u USERID] [--version] verb filename
+usage: wcpctl.py [-h] [--version] {create,apply,delete,describe} ...
 
 wcpctl controls for managing Supervisor Clusters in vSphere 7 with K8s. Uses
-YAML configuration files to setup and manage the Supervisor Cluster. For
-additional information go to https://github.io/papivot/wcpctl
+YAML configuration files to setup and manage the Supervisor Cluster. Find
+additional information at: https://github.io/papivot/wcpctl
 
 positional arguments:
-  verb        Provide action to perform. Currently supports
-              create/apply/delete
-  filename    yaml file with WCP configuration. See examples for help
+  {create,apply,delete,describe}
+                        Commands
+    create              Create WCP object(s)
+    apply               Apply configuration changes to WCP object(s)
+    delete              Delete WCP object(s)
+    describe            Describe a WCP object(s)
 
 optional arguments:
-  -h, --help  show this help message and exit
-  -u USERID   VCenter userid. If not provided, will default to
-              administrator@vsphere.local
-  --version   show program's version number and exit
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+  
 ```
 ### Sample Examples
 
@@ -72,6 +79,11 @@ python3 wcpctl.py delete some-wcp-cluster-config.yaml
 #### To modify Namespace(s) 
 ```
 python3 wcpctl.py apply some-namespaceconfig.yaml
+```
+
+#### To modify Namespace(s) 
+```
+python3 wcpctl.py describe some-nsconfigfile.yaml
 ```
 
 ### Feedback
