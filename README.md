@@ -55,9 +55,10 @@ optional arguments:
 ```
 ### Sample Examples
 
-#### To enable/create a Supervisor Cluster, modify the `wcp-cluster.yaml` sample provided in the `sample-config-yaml` folder. Make sure that the following are enabled/configured (as per official docs) - 
-* Relevent Content Library
-* NSX configuration
+#### To enable/create a Supervisor Cluster
+* modify the `wcp-cluster.yaml` sample provided in the `sample-config-yaml` folder. Make sure that the following are enabled/configured (as per official docs) - 
+  ** Relevent Content Library
+  ** NSX configuration
 
 ```
 python3 wcpctl.py create some-wcp-cluster-config.yaml -u administrator@vsphere.local
@@ -66,8 +67,10 @@ python3 wcpctl.py create some-wcp-cluster-config.yaml -u administrator@vsphere.l
 #### To disable the Supervisor Cluster, 
 
 ```
-python3 wcpctl.py delete some-wcp-cluster-config.yaml -u administrator@vsphere.local
+python3 wcpctl.py delete some-wcp-cluster-config.yaml
 ```
+
+### To modify Namespace(s) 
 
 
 
