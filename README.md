@@ -53,5 +53,22 @@ optional arguments:
               administrator@vsphere.local
   --version   show program's version number and exit
 ```
+### Sample Examples
+
+#### To enable/create a Supervisor Cluster, modify the `wcp-cluster.yaml` sample provided in the `sample-config-yaml` folder. Make sure that the following are enabled/configured (as per official docs) - 
+* Relevent Content Library
+* NSX configuration
+
+```
+python3 wcpctl.py create some-wcp-cluster-config.yaml -u administrator@vsphere.local
+```
+
+#### To disable the Supervisor Cluster, 
+
+```
+python3 wcpctl.py delete some-wcp-cluster-config.yaml -u administrator@vsphere.local
+```
+
+
 
 
