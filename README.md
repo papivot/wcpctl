@@ -74,6 +74,8 @@ python3 wcpctl.py delete some-wcp-cluster-config.yaml
 python3 wcpctl.py apply some-namespaceconfig.yaml
 ```
 
+### Feedback
 
+Would love feedback from users. 
 
 
