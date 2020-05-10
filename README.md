@@ -65,12 +65,14 @@ python3 wcpctl.py create some-wcp-cluster-config.yaml -u administrator@vsphere.l
 ```
 
 #### To disable the Supervisor Cluster, 
-
 ```
 python3 wcpctl.py delete some-wcp-cluster-config.yaml
 ```
 
 #### To modify Namespace(s) 
+```
+python3 wcpctl.py apply some-namespaceconfig.yaml
+```
 
 
 
