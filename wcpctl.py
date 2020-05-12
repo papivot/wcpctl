@@ -9,7 +9,7 @@ import argparse
 import getpass
 
 parser = argparse.ArgumentParser(description='wcpctl controls for managing Supervisor Clusters in vSphere 7 with K8s. Uses YAML configuration files to setup and manage the Supervisor Cluster. Find additional information at: https://github.io/papivot/wcpctl')
-parser.add_argument('--version', action='version',version='%(prog)s v0.1')
+parser.add_argument('--version', action='version',version='%(prog)s v0.2')
 subparsers = parser.add_subparsers(help='Commands',dest='verb')
 
 # A create command
@@ -43,18 +43,10 @@ if cmd.userid:
     userid = cmd.userid
 else:
     userid = "administrator@vsphere.local"
-
 password = getpass.getpass(prompt='Password: ')
 
-########### Enable for debugging
-############
-#verb = "create"
-#verb = "delete"
-#verb = "apply"
-#verb = "describe"
-#filename = 'wcpall-haas.yaml'
-#userid = "administrator@vsphere.local"
-#password = "VMware1!"
+#Edit this line to skip providing password in CLI. For script/automation
+#password = "mypassword"
 
 def generate_random_uuid():
     return str(uuid.uuid4())
@@ -104,7 +96,7 @@ def get_nsx_edge_cluster(cluster,dvs):
         return edge_id
     else:
         return 0
-        
+
 def get_mgmt_network(mgmt_nw_name, dc):
     json_response=s.get('https://'+vcip+'/rest/vcenter/network?filter.datacenters='+dc)
     if json_response.ok:
@@ -386,10 +378,8 @@ with open(filename,) as f:
                 else:
                     print ("wcpCluster/"+cluster+" not compatiable")
 
-               # json_payload = json.loads(json.dumps(mypayload))
-               # aa = check_wcp_cluster_compatibility(cluster_id)             
-                #if check_wcp_cluster_status(cluster_id):
-                    # To patch cluster
+
+                 # TO DO : stub to patch server
                  #   json_response = s.patch('https://'+vcip+'/api/vcenter/namespace-management/clusters/'+cluster_id, headers=headers,json=json_payload)
                  #   if json_response.ok:
                  #       print ("wcpCluster/"+cluster+" updated")
@@ -397,16 +387,14 @@ with open(filename,) as f:
                  #       print ("wcpCluster/"+cluster+" update failed")
                  #       print (json_response.text)
 
-                    # To rotate password
-                    #json_response = s.post('https://'+vcip+'/api/vcenter/namespace-management/clusters/'+cluster_id+'?action=rotate_password')
-                    #if json_response.ok:
-                    #    print ("wcpCluster/"+cluster+" password rotated")
-                    #else:
-                    #    print ("wcpCluster/"+cluster+" password rotation failed")
-                    #    print (json_response.text)
-               # else:
-                #    print ("wcpCluster/"+cluster+" not operational")    
-                           
+                # To rotate password
+                #   json_response = s.post('https://'+vcip+'/api/vcenter/namespace-management/clusters/'+cluster_id+'?action=rotate_password')
+                #   if json_response.ok:
+                #       print ("wcpCluster/"+cluster+" password rotated")
+                #   else:
+                #       print ("wcpCluster/"+cluster+" password rotation failed")
+                #       print (json_response.text)
+                             
             ################ apply wcpRegistry
             if objtype == "wcpRegistry":
                 #same as create as no modify option
@@ -481,6 +469,7 @@ with open(filename,) as f:
 
         elif verb == 'describe':
 
+            ################ describe wcpCluster
             if objtype == "wcpCluster":
                 if check_wcp_cluster_status(cluster_id):
                     json_response = s.get('https://'+vcip+'/api/vcenter/namespace-management/clusters/'+cluster_id)
@@ -492,6 +481,7 @@ with open(filename,) as f:
                 else:
                     print("wcpCluster/"+cluster+" not ready")
                     
+            ################ describe wcpRegistry
             if objtype == "wcpRegistry":
                 harbor_id = check_wcp_harbor_status(cluster_id)
                 if harbor_id:
@@ -504,6 +494,7 @@ with open(filename,) as f:
                 else:
                     print ("wcpRegistry/Harbor not found")
 
+            ################ describe wcpNamespace
             if objtype == "wcpNamespace":
                 json_response = s.get('https://'+vcip+'/api/vcenter/namespaces/instances')
                 if (json_response.ok):
@@ -520,4 +511,4 @@ with open(filename,) as f:
                     print ("wcpNamespace error describing")
 
         # Clean up and exit...
-        session_delete=s.delete('https://'+vcip+'/rest/com/vmware/cis/session',auth=("Administrator@vsphere.local","Passw0rd!"))
+        session_delete=s.delete('https://'+vcip+'/rest/com/vmware/cis/session',auth=(userid,password))
