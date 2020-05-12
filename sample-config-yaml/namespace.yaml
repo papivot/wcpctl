@@ -20,10 +20,11 @@ spec:
   - limit: 200
     policy: pacific-gold-storage-policy
   resource_spec:
-#   Resources ot implemented yet
-#   cpu_limit: 1
-#   memory_limit: 1
-#   storage_request_limit: 1
+#   Resources not implemented yet
+#   com.vmware.vcenter.namespaces.resource_quota_options_v1_update:
+#     cpu_limit: 200
+#     memory_limit: 200
+#     storage_request_limit: 200
 ---
 kind: wcpNamespace
 metadata:
@@ -47,7 +48,8 @@ spec:
   - limit: 200
     policy: pacific-gold-storage-policy
   resource_spec:
-#   Resources ot implemented yet
-#   cpu_limit: 1
-#   memory_limit: 1
-#   storage_request_limit: 1
+# Resources ot implemented yet
+#   com.vmware.vcenter.namespaces.resource_quota_options_v1_update:
+#     cpu_limit: 200
+#     memory_limit: 200
+#     storage_request_limit: 200
