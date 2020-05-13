@@ -17,10 +17,10 @@ Some guidance inspired from the awesome work of *vthinkbeyondvm.com*
 ### Currently the following actions are supported - 
 * Creation of the Supervisor Cluster
 * Creation of Namespaces
-* Creation of Harbor registry (WIP)
+* Creation of Harbor registry
 * Reconfiguration of Namespaces (Resource config is a WIP)
 * Deletion of Namespaces
-* Deletion of Harbor registry (WIP)
+* Deletion of Harbor registry 
 * Deletion of Supervisor cluster
 * Describe Namespace(s) (JSON output)
 * Describe WCP Registry (JSON output)
@@ -78,9 +78,15 @@ python3 wcpctl.py create some-wcp-cluster-config.yaml -u administrator@vsphere.l
 python3 wcpctl.py delete some-wcp-cluster-config.yaml
 ```
 
+
 #### To modify Namespace(s) 
 ```
 python3 wcpctl.py apply some-namespaceconfig.yaml
+```
+
+#### To create a Registry 
+```
+python3 wcpctl.py create some-regconfig.yaml
 ```
 
 #### To describe Registry 
