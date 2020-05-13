@@ -142,7 +142,19 @@ def check_wcp_harbor_status(cluster):
         else:
             return 0
     else:
-        return 0      
+        return 0
+
+def check_wcp_harbor_ui_url_status(cluster):
+    json_response = s.get('https://'+vcip+'/rest/vcenter/content/registries/harbor')
+    if json_response.ok:
+        results = json.loads(json_response.text)["value"]
+        for result in results:
+            if result["cluster"] == cluster:
+                return result["ui_access_url"]
+        else:
+            return 0
+    else:
+        return 0   
 
 def check_wcp_ns_status(ns_name):
     json_response = s.get('https://'+vcip+'/api/vcenter/namespaces/instances/'+ns_name)
@@ -172,6 +184,8 @@ with open(filename,) as f:
         if not vcsession.ok:
             print ("Session creation is failed, please check vcenter connection")
             sys.exit()
+        token = json.loads(vcsession.text)["value"]
+        token_header = {'vmware-api-session-id': token }
 
         # Based on the datacenter get all datacenters
         datacenter_object=s.get('https://'+vcip+'/rest/vcenter/datacenter?filter.names='+datacenter)
@@ -254,7 +268,8 @@ with open(filename,) as f:
                     del yamldoc["metadata"]
                     client_token=generate_random_uuid()
                     yamldoc.update({"client_token": client_token}) 
-                    yamldoc["spec"].update({"cluster": cluster_id}) 
+                    yamldoc["spec"].update({"cluster": cluster_id})
+                    reg_creation_started = 0
                     i = 0
                     # Update variables and proceed
                     for sp in yamldoc["spec"]["storage"]:
@@ -266,17 +281,23 @@ with open(filename,) as f:
                             sys.exit()
                         i = i+1
                     json_payload = json.loads(json.dumps(yamldoc))
-
+                    headers.update({'vmware-api-session-id': token})
                     json_response = s.post('https://'+vcip+'/rest/vcenter/content/registries/harbor',headers=headers,json=json_payload)
                     if json_response.ok:
-                        print ("wcpRegistry/Harbor created")
-                        time.sleep(15)
+                        print ("wcpRegistry/Harbor creation started")
+                        reg_creation_started = 1
                     else:
                         print ("wcpRegistry/Harbor failed")
-                        print (json_response.text)                    
+                        print (json_response.text)    
+
+                    if reg_creation_started == 1:
+                        while not check_wcp_harbor_ui_url_status(cluster_id):
+                            print("Sleeping for 20 sec...")
+                            time.sleep(20)
+                    print("wcpRegistry/Harbor access URL "+check_wcp_harbor_ui_url_status(cluster_id))
                 else:
                     print("wcpRegistry/Harbor already running")
-            
+                
             ################ create wcpNamespace
             if objtype == "wcpNamespace":                
                 if not check_wcp_ns_status(spec["namespace"]):
@@ -318,18 +339,24 @@ with open(filename,) as f:
 
             ################ delete wcpRegistry
             if objtype == "wcpRegistry":
+                reg_destruction_started = 0
                 harbor_id = check_wcp_harbor_status(cluster_id)
                 if harbor_id:
-                    json_response = s.delete('https://'+vcip+'/rest/vcenter/content/registries/harbor/'+harbor_id)
+                    json_response = s.delete('https://'+vcip+'/rest/vcenter/content/registries/harbor/'+harbor_id, headers=token_header)
                     if (json_response.ok):
-                        print ("wcpRegistry/Harbor deleted")
+                        print ("wcpRegistry/Harbor deletion started")
+                        reg_destruction_started = 1
                     else:
                         print ("wcpRegistry/Harbor deletion failed")
                         print (json_response.text)
+                    
+                    if reg_destruction_started == 1:
+                        while check_wcp_harbor_status(cluster_id):
+                            print("Sleeping for 20 sec...")
+                            time.sleep(20)
                 else:
                     print ("wcpRegistry/Harbor not found")
-                    print (json_response.text)
-            
+
             ################ delete wcpNamespace    
             if objtype == "wcpNamespace":
                 json_response = s.delete('https://'+vcip+'/api/vcenter/namespaces/instances/'+spec["namespace"])
@@ -415,14 +442,20 @@ with open(filename,) as f:
                             sys.exit()
                         i = i+1
                     json_payload = json.loads(json.dumps(yamldoc))
-
+                    headers.update({'vmware-api-session-id': token})
                     json_response = s.post('https://'+vcip+'/rest/vcenter/content/registries/harbor',headers=headers,json=json_payload)
                     if json_response.ok:
                         print ("wcpRegistry/Harbor created")
-                        time.sleep(15)
+                        reg_creation_started = 1
                     else:
                         print ("wcpRegistry/Harbor failed")
-                        print (json_response.text)                    
+                        print (json_response.text)
+
+                    if reg_creation_started == 1:
+                        while not check_wcp_harbor_ui_url_status(cluster_id):
+                            print("Sleeping for 20 sec...")
+                            time.sleep(20)
+                    print("wcpRegistry/Harbor access URL "+check_wcp_harbor_ui_url_status(cluster_id))
                 else:
                     print("wcpRegistry/Harbor already running")
 
