@@ -10,8 +10,8 @@ Some guidance inspired from the awesome work of *vthinkbeyondvm.com*
 ---
 
 * Language - Python (tested on v3.7, MacOS and Linux)
-* Required modules - requests, json, time, yaml, uuid, argparse, getpass
-  * `pip3 install -U PyYAML` 
+* Required modules - requests, json, time, yaml, uuid, argparse, getpass 
+  * Most are generally available. May require install of yaml using the following - `pip3 install -U PyYAML` 
 
 ---
 
