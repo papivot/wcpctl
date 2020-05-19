@@ -1,5 +1,5 @@
 # WCPCTL
-## A `kubectl` like commandline tool to interact with vSphere 7 with Kubernetes Supervisor Cluster.
+## A `kubectl` style command line tool to interact with vSphere 7 with Kubernetes Supervisor Cluster.
 
 ---
 
