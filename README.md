@@ -72,6 +72,11 @@ optional arguments:
 
 ```
 python3 wcpctl.py create some-wcp-cluster-config.yaml -u administrator@vsphere.local
+
+or (if wcpctl.py has been copied to $PATH folder)
+
+wcpctl.py create some-wcp-cluster-config.yaml -u administrator@vsphere.local
+
 ```
 
 #### To disable the Supervisor Cluster, 
