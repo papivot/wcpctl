@@ -1,9 +1,9 @@
 ---
 kind: wcpRegistry
 metadata:
-  vcenter: pacific-vcsa.haas-270.pez.pivotal.io
-  datacenter: Pacific-Datacenter                        
-  cluster: Workload-Cluster                             
+  vcenter: pacific-vcsa.haas-270.pez.pivotal.io       # Modify this
+  datacenter: Pacific-Datacenter                      # Modify this  
+  cluster: Workload-Cluster                           # Modify this  
 spec:
   garbage_collection:
     minute: 0
@@ -11,5 +11,5 @@ spec:
     type: WEEKLY
     day_of_week: SUNDAY
   storage:
-  - policy: pacific-gold-storage-policy
-    limit: 204800
+  - policy: pacific-gold-storage-policy               # Modify this
+    limit: 204800                                     # Modify this
