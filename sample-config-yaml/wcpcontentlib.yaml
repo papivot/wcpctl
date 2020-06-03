@@ -1,0 +1,19 @@
+---
+kind: wcpContentLibrary
+metadata:
+  vcenter: vcsa-01.haas-247.pez.pivotal.io
+  datacenter: Datacenter
+  cluster: Cluster
+spec:
+  name: Kubernetes
+  description: "Default Content Library for WCP"
+  storage_backings:
+    - datastore_id: LUN01
+      type: "DATASTORE"
+  type: SUBSCRIBED
+  subscription_info:
+    authentication_method: NONE
+    ssl_thumbprint: 56:53:d1:6f:ce:b9:c1:c9:25:d5:7f:41:11:df:7b:00:2c:97:bf:95
+    automatic_sync_enabled: True
+    subscription_url: "https://wp-content.vmware.com/v2/latest/lib.json"
+    on_demand: False
