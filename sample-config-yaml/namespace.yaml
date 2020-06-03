@@ -1,10 +1,10 @@
 kind: wcpNamespace
 metadata:
-  vcenter: pacific-vcsa.haas-270.pez.pivotal.io
-  datacenter: Pacific-Datacenter                        
-  cluster: Workload-Cluster                             
+  vcenter: pacific-vcsa.haas-270.pez.pivotal.io            # Modify this
+  datacenter: Pacific-Datacenter                           # Modify this
+  cluster: Workload-Cluster                                # Modify this
 spec:
-  namespace: demonamespace1
+  namespace: demonamespace1                                # Modify this
   Description: 'Demo NS 1'
   access_list:
   - role: EDIT
@@ -18,7 +18,7 @@ spec:
 #   domain: vsphere.local
   storage_specs:
   - limit: 200
-    policy: pacific-gold-storage-policy
+    policy: pacific-gold-storage-policy                     # Modify this
   resource_spec:
 #   Resources not implemented yet
 #   com.vmware.vcenter.namespaces.resource_quota_options_v1_update:
@@ -28,11 +28,11 @@ spec:
 ---
 kind: wcpNamespace
 metadata:
-  vcenter: pacific-vcsa.haas-270.pez.pivotal.io
-  datacenter: Pacific-Datacenter                        
-  cluster: Workload-Cluster                             
+  vcenter: pacific-vcsa.haas-270.pez.pivotal.io              # Modify this
+  datacenter: Pacific-Datacenter                             # Modify this
+  cluster: Workload-Cluster                                  # Modify this
 spec:
-  namespace: demonamespace2
+  namespace: demonamespace2                                  # Modify this
   Description: 'Demo NS 2'
   access_list:
   - role: EDIT
@@ -46,7 +46,7 @@ spec:
 #   domain: vsphere.local
   storage_specs:
   - limit: 200
-    policy: pacific-gold-storage-policy
+    policy: pacific-gold-storage-policy                      # Modify this
   resource_spec:
 # Resources ot implemented yet
 #   com.vmware.vcenter.namespaces.resource_quota_options_v1_update:
