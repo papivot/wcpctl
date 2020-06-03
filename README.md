@@ -71,37 +71,30 @@ optional arguments:
   - NSX configuration
 
 ```
-python3 wcpctl.py create some-wcp-cluster-config.yaml -u administrator@vsphere.local
-
-or (if wcpctl.py has been copied to $PATH folder)
-
-wcpctl.py create some-wcp-cluster-config.yaml -u administrator@vsphere.local
-
+./wcpctl.py create some-wcp-cluster-config.yaml -u administrator@vsphere.local
 ```
 
 #### To disable the Supervisor Cluster, 
 ```
-python3 wcpctl.py delete some-wcp-cluster-config.yaml
+./wcpctl.py delete some-wcp-cluster-config.yaml
 ```
 
 
 #### To modify Namespace(s) 
 ```
-python3 wcpctl.py apply some-namespaceconfig.yaml
+./wcpctl.py apply some-namespaceconfig.yaml
 ```
 
 #### To create a Registry 
 ```
-python3 wcpctl.py create some-regconfig.yaml
+./wcpctl.py create some-regconfig.yaml
 ```
 
 #### To describe Registry 
 ```
-python3 wcpctl.py describe some-nsconfigfile.yaml
+./wcpctl.py describe some-nsconfigfile.yaml
 ```
 
 ### Feedback
 
 Would love feedback from users. 
-
-
