@@ -1,14 +1,14 @@
 ---
 kind: wcpContentLibrary
 metadata:
-  vcenter: vcsa-01.haas-247.pez.pivotal.io
-  datacenter: Datacenter
-  cluster: Cluster
+  vcenter: vcsa-01.haas-270.pez.pivotal.io      # Modify this
+  datacenter: Datacenter                        # Modify this
+  cluster: Cluster                              # Modify this
 spec:
   name: Kubernetes
   description: "Default Content Library for WCP"
   storage_backings:
-    - datastore_id: LUN01
+    - datastore_id: LUN01                       # Modify this
       type: "DATASTORE"
   type: SUBSCRIBED
   subscription_info:
