@@ -9,7 +9,7 @@ import argparse
 import getpass
 
 parser = argparse.ArgumentParser(description='wcpctl controls for managing Supervisor Clusters in vSphere 7 with K8s. Uses YAML configuration files to setup and manage the Supervisor Cluster. Find additional information at: https://github.io/papivot/wcpctl')
-parser.add_argument('--version', action='version',version='%(prog)s v0.2')
+parser.add_argument('--version', action='version',version='%(prog)s v0.3')
 subparsers = parser.add_subparsers(help='Commands',dest='verb')
 
 # A create command
@@ -50,6 +50,17 @@ password = getpass.getpass(prompt='Password: ')
 
 def generate_random_uuid():
     return str(uuid.uuid4())
+
+def get_storage_id(storage_name,dc):
+    json_response = s.get('https://'+vcip+'/rest/vcenter/datastore?filter.datacenters='+dc+'&filter.names='+storage_name)
+    if json_response.ok:
+        results = json.loads(json_response.text)["value"]
+        for result in results:
+            if result["name"] == storage_name:
+                return result["datastore"]
+    else:
+        return 0
+    return 0
 
 def get_storage_policy(sp_name):
     json_response = s.get('https://'+vcip+'/rest/vcenter/storage/policies')
@@ -321,6 +332,34 @@ with open(filename,) as f:
                         print(json_response.text)
                 else:
                     print("wcpNamespace/"+spec["namespace"]+" already exists. No changes made")
+            
+            ################ create wcpContentLibrary
+            if objtype == "wcpContentLibrary":
+                if not get_content_library(yamldoc["spec"].get("name")):
+                    del yamldoc["kind"]
+                    del yamldoc["metadata"]
+                    client_token=generate_random_uuid()
+                    yamldoc.update({"client_token": client_token})
+                    i = 0
+                    for sb in yamldoc["spec"]["storage_backings"]:
+                        temp1 = get_storage_id(sb["datastore_id"],datacenter_id)
+                        if temp1:
+                            yamldoc["spec"]["storage_backings"][i].update({"datastore_id": temp1})
+                        else:
+                            print ("wcpContentLibrary invalid storage name specified")
+                            sys.exit()
+                        i = i+1
+                    yamldoc["create_spec"] = yamldoc.pop("spec")
+                    json_payload = json.loads(json.dumps(yamldoc))
+                    headers.update({'vmware-api-session-id': token})
+                    json_response = s.post('https://'+vcip+'/rest/com/vmware/content/subscribed-library',headers=headers,json=json_payload)
+                    if json_response.ok:
+                        print ("wcpContentLibrary/Subscribed_library created")
+                    else:
+                        print ("wcpContentLibrary/Subscribed_library created")
+                        print (json_response.text)    
+                else:
+                    print("wcpContentLibrary/Subscribed_library already running")                
 
         elif verb == "delete":
 
@@ -365,6 +404,20 @@ with open(filename,) as f:
                 else:
                     print ("wcpNamespace/"+spec["namespace"]+" deletion failed")
                     print (json_response.text)
+
+            ################ delete wcpContentLibrary    
+            if objtype == "wcpContentLibrary":
+                contentlibrary_id = get_content_library(yamldoc["spec"].get("name"))
+                if contentlibrary_id:
+                    json_response = s.delete('https://'+vcip+'/rest/com/vmware/content/subscribed-library/id:'+contentlibrary_id)
+                    if (json_response.ok):
+                        print ("wcpContentLibrary/Subscribed_library successfully deleted")
+                    else:
+                        print ("wcpContentLibrary/Subscribed_library deletion failed")
+                        result = json.loads(json_response.text)
+                        print(json.dumps(result,indent=2,sort_keys=True))
+                else:
+                    print ("wcpContentLibrary/Subscribed library not found")
 
         elif verb == "apply":
 
@@ -500,6 +553,34 @@ with open(filename,) as f:
                         print ("wcpNamespace/"+spec["namespace"]+" creation failed")
                         print (json_response.text)
 
+            ################ apply wcpContentLibrary
+            if objtype == "wcpContentLibrary":
+                if not get_content_library(yamldoc["spec"].get("name")):
+                    del yamldoc["kind"]
+                    del yamldoc["metadata"]
+                    client_token=generate_random_uuid()
+                    yamldoc.update({"client_token": client_token})
+                    i = 0
+                    for sb in yamldoc["spec"]["storage_backings"]:
+                        temp1 = get_storage_id(sb["datastore_id"],datacenter_id)
+                        if temp1:
+                            yamldoc["spec"]["storage_backings"][i].update({"datastore_id": temp1})
+                        else:
+                            print ("wcpContentLibrary invalid storage name specified")
+                            sys.exit()
+                        i = i+1
+                    yamldoc["create_spec"] = yamldoc.pop("spec")
+                    json_payload = json.loads(json.dumps(yamldoc))
+                    headers.update({'vmware-api-session-id': token})
+                    json_response = s.post('https://'+vcip+'/rest/com/vmware/content/subscribed-library',headers=headers,json=json_payload)
+                    if json_response.ok:
+                        print ("wcpContentLibrary/Subscribed_library created")
+                    else:
+                        print ("wcpContentLibrary/Subscribed_library created")
+                        print (json_response.text)    
+                else:
+                    print("wcpContentLibrary/Subscribed_library already running")                
+
         elif verb == 'describe':
 
             ################ describe wcpCluster
@@ -542,6 +623,19 @@ with open(filename,) as f:
                                 print ("wcpNamespace"+result["namespace"]+" error describing")
                 else:
                     print ("wcpNamespace error describing")
+
+            ################ describe wcpContentLibrary
+            if objtype == "wcpContentLibrary":
+                contentlibrary_id = get_content_library(yamldoc["spec"].get("name"))
+                if contentlibrary_id:
+                    json_response = s.get('https://'+vcip+'/rest/com/vmware/content/subscribed-library/id:'+contentlibrary_id)
+                    if (json_response.ok):
+                        result = json.loads(json_response.text)
+                        print(json.dumps(result,indent=2,sort_keys=True))
+                    else:
+                        print ("wcpContentLibrary/Subscribed library error describing")
+                else:
+                    print ("wcpContentLibrary/Subscribed library not found")
 
         # Clean up and exit...
         session_delete=s.delete('https://'+vcip+'/rest/com/vmware/cis/session',auth=(userid,password))
