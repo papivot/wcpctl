@@ -19,15 +19,16 @@ Some guidance inspired from the awesome work of *vthinkbeyondvm.com*
 * Creation of the Supervisor Cluster
 * Creation of Namespaces
 * Creation of Harbor registry
+* Creation of Subscribed Content Library
 * Reconfiguration of Namespaces (Resource config is a WIP)
 * Deletion of Namespaces
 * Deletion of Harbor registry 
 * Deletion of Supervisor cluster
+* Deletion of Subscribed Content Library
 * Describe Namespace(s) (JSON output)
 * Describe WCP Registry (JSON output)
 * Describe WCP Cluster (JSON output)
-
-
+* Describe Subscribed Content Library
 
 ---
 
@@ -37,11 +38,13 @@ Some guidance inspired from the awesome work of *vthinkbeyondvm.com*
 * Make sure you have admin access to the vCenter server.
 * Make sure the workstation where the `wcpctl` cli will run on has access to the VCenter server. 
 * Clone this repo. 
+* Execute `chmod +x wcpctl.py` if its not already set to execute. 
 * Modify the YAML config files provided in the `sample-config-yaml` folder. 
+* If possible, move the `wcpctl.py` file a folder in $PATH. E.g. `sudo cp wcpctl.py /usr/local/bin`
 * Execute the `wcpctl` code.
 
 ```
-$ python3 wcpctl.py -h  
+$ wcpctl.py -h  
 =============================================================================
 
 usage: wcpctl.py [-h] [--version] {create,apply,delete,describe} ...
@@ -71,29 +74,35 @@ optional arguments:
   - NSX configuration
 
 ```
-./wcpctl.py create some-wcp-cluster-config.yaml -u administrator@vsphere.local
+wcpctl.py create some-wcp-cluster-config.yaml -u administrator@vsphere.local
 ```
 
 #### To disable the Supervisor Cluster, 
 ```
-./wcpctl.py delete some-wcp-cluster-config.yaml
+wcpctl.py delete some-wcp-cluster-config.yaml
 ```
 
 
 #### To modify Namespace(s) 
 ```
-./wcpctl.py apply some-namespaceconfig.yaml
+wcpctl.py apply some-namespaceconfig.yaml
 ```
 
 #### To create a Registry 
 ```
-./wcpctl.py create some-regconfig.yaml
+wcpctl.py create some-regconfig.yaml
 ```
 
 #### To describe Registry 
 ```
-./wcpctl.py describe some-nsconfigfile.yaml
+wcpctl.py describe some-nsconfigfile.yaml
 ```
+
+#### To create a WCP content library
+```
+wcpctl.py create some-contentlibconfigfile.yaml
+```
+
 
 ### Feedback
 
