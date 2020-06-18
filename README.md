@@ -11,7 +11,8 @@ Some guidance inspired from the awesome work of *vthinkbeyondvm.com*
 
 * Language - Python (tested on v3.7, MacOS, Linux and Windows Server 2016)
 * Required modules - requests, json, time, yaml, uuid, argparse, getpass 
-  * Most are generally available. May require install of yaml using the following - `pip3 install -U PyYAML` . Windows additionally may require requests. This can be installed by `pip3 install requests`.
+  * Most are generally available. May require install of yaml using the following - `pip3 install -U PyYAML` . 
+  * Windows additionally may require requests. This can be installed by `pip3 install requests`.
 
 ---
 
