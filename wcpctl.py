@@ -7,6 +7,7 @@ import sys
 import uuid
 import argparse
 import getpass
+import os
 
 parser = argparse.ArgumentParser(description='wcpctl controls for managing Supervisor Clusters in vSphere 7 with K8s. Uses YAML configuration files to setup and manage the Supervisor Cluster. Find additional information at: https://github.io/papivot/wcpctl')
 parser.add_argument('--version', action='version',version='%(prog)s v0.3')
@@ -42,11 +43,15 @@ filename = cmd.filename
 if cmd.userid:
     userid = cmd.userid
 else:
-    userid = "administrator@vsphere.local"
-password = getpass.getpass(prompt='Password: ')
+    if os.environ.get('USERNAME') == "":
+        userid = "administrator@vsphere.local"
+    else:
+        userid = os.environ.get('USERNAME')
 
-#Edit this line to skip providing password in CLI. For script/automation
-#password = "mypassword"
+if os.environ.get('PASSWORD') == "":
+    password = getpass.getpass(prompt='Password: ')
+else:
+    password = os.environ.get('PASSWORD')
 
 def generate_random_uuid():
     return str(uuid.uuid4())

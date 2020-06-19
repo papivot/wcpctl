@@ -1,0 +1,6 @@
+argparse
+requests
+PyYAML
+jsonpatch==1.16
+jsonpointer==1.10
+jsonschema==2.6.0
