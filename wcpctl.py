@@ -34,8 +34,9 @@ describe_parser.add_argument('filename', action='store', help='YAML file with WC
 describe_parser.add_argument('-u', action="store", dest="userid", help='VCenter userid. If not provided, will default to administrator@vsphere.local')
 
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-headers = {'content-type':'application/json'}
+headers = {'content-type': 'application/json'}
 
 cmd = parser.parse_args()
 verb = cmd.verb
@@ -43,18 +44,20 @@ filename = cmd.filename
 if cmd.userid:
     userid = cmd.userid
 else:
-    if os.environ.get('USERNAME') == "":
+    if os.environ.get('WCP_USERNAME') == "":
         userid = "administrator@vsphere.local"
     else:
-        userid = os.environ.get('USERNAME')
+        userid = os.environ.get('WCP_USERNAME')
 
-if os.environ.get('PASSWORD') == "":
+if os.environ.get('WCP_PASSWORD') == "":
     password = getpass.getpass(prompt='Password: ')
 else:
-    password = os.environ.get('PASSWORD')
+    password = os.environ.get('WCP_PASSWORD')
+
 
 def generate_random_uuid():
     return str(uuid.uuid4())
+
 
 def get_storage_id(storage_name,dc):
     json_response = s.get('https://'+vcip+'/rest/vcenter/datastore?filter.datacenters='+dc+'&filter.names='+storage_name)
@@ -67,8 +70,9 @@ def get_storage_id(storage_name,dc):
         return 0
     return 0
 
+
 def get_storage_policy(sp_name):
-    json_response = s.get('https://'+vcip+'/rest/vcenter/storage/policies')
+    json_response = s.get('https://' + vcip + '/rest/vcenter/storage/policies')
     if json_response.ok:
         results = json.loads(json_response.text)["value"]
         for result in results:
@@ -78,43 +82,46 @@ def get_storage_policy(sp_name):
             return 0
     else:
         return 0
-    return 0
+
 
 def get_content_library(cl_name):
-    json_response = s.get('https://'+vcip+'/rest/com/vmware/content/library')
+    json_response = s.get('https://' + vcip + '/rest/com/vmware/content/library')
     if json_response.ok:
         results = json.loads(json_response.text)["value"]
         for result in results:
-            json_response = s.get('https://'+vcip+'/rest/com/vmware/content/library/id:'+result)
+            json_response = s.get('https://' + vcip + '/rest/com/vmware/content/library/id:' + result)
             if json_response.ok:
                 cl_library = json.loads(json_response.text)["value"]
                 if cl_library["name"] == cl_name:
                     return cl_library["id"]
-    else:    
+    else:
         return 0
     return 0
+
 
 def get_nsx_switch(cluster):
     json_response = s.get('https://'+vcip+'/api/vcenter/namespace-management/distributed-switch-compatibility?cluster='+cluster+'&compatible=true')
     if json_response.ok:
         results = json.loads(json_response.text)
         # Making assumption that there is only 1 distributed switch.
-        nsx_sw_id=results[0]['distributed_switch']
+        nsx_sw_id = results[0]['distributed_switch']
         return nsx_sw_id
     else:
         return 0
+
 
 def get_nsx_edge_cluster(cluster,dvs):
     json_response = s.get('https://'+vcip+'/api/vcenter/namespace-management/edge-cluster-compatibility?cluster='+cluster+'&compatible=true&distributed_switch='+dvs)
     if json_response.ok:
         results = json.loads(json_response.text)
-        edge_id=results[0]['edge_cluster']
+        edge_id = results[0]['edge_cluster']
         return edge_id
     else:
         return 0
 
+
 def get_mgmt_network(mgmt_nw_name, dc):
-    json_response=s.get('https://'+vcip+'/rest/vcenter/network?filter.datacenters='+dc)
+    json_response = s.get('https://' + vcip + '/rest/vcenter/network?filter.datacenters=' + dc)
     if json_response.ok:
         results = json.loads(json_response.text)["value"]
         for result in results:
@@ -124,8 +131,9 @@ def get_mgmt_network(mgmt_nw_name, dc):
         return 0
     return 0
 
+
 def check_wcp_cluster_compatibility(cluster):
-    json_response = s.get('https://'+vcip+'/api/vcenter/namespace-management/cluster-compatibility')
+    json_response = s.get('https://' + vcip + '/api/vcenter/namespace-management/cluster-compatibility')
     if json_response.ok:
         results = json.loads(json_response.text)
         res = next((sub for sub in results if sub['cluster'] == cluster), None)
@@ -135,9 +143,10 @@ def check_wcp_cluster_compatibility(cluster):
             return 0
     else:
         return 0
-        
+
+
 def check_wcp_cluster_status(cluster):
-    json_response = s.get('https://'+vcip+'/api/vcenter/namespace-management/clusters/'+cluster)
+    json_response = s.get('https://' + vcip + '/api/vcenter/namespace-management/clusters/' + cluster)
     if json_response.ok:
         result = json.loads(json_response.text)
         if result["config_status"] == "RUNNING":
@@ -148,8 +157,9 @@ def check_wcp_cluster_status(cluster):
     else:
         return 0
 
+
 def check_wcp_harbor_status(cluster):
-    json_response = s.get('https://'+vcip+'/rest/vcenter/content/registries/harbor')
+    json_response = s.get('https://' + vcip + '/rest/vcenter/content/registries/harbor')
     if json_response.ok:
         results = json.loads(json_response.text)["value"]
         for result in results:
@@ -160,8 +170,9 @@ def check_wcp_harbor_status(cluster):
     else:
         return 0
 
+
 def check_wcp_harbor_ui_url_status(cluster):
-    json_response = s.get('https://'+vcip+'/rest/vcenter/content/registries/harbor')
+    json_response = s.get('https://' + vcip + '/rest/vcenter/content/registries/harbor')
     if json_response.ok:
         results = json.loads(json_response.text)["value"]
         for result in results:
@@ -170,10 +181,11 @@ def check_wcp_harbor_ui_url_status(cluster):
         else:
             return 0
     else:
-        return 0   
+        return 0
+
 
 def check_wcp_ns_status(ns_name):
-    json_response = s.get('https://'+vcip+'/api/vcenter/namespaces/instances/'+ns_name)
+    json_response = s.get('https://' + vcip + '/api/vcenter/namespaces/instances/' + ns_name)
     if json_response.ok:
         result = json.loads(json_response.text)
         if result["config_status"] == "RUNNING":
@@ -183,7 +195,8 @@ def check_wcp_ns_status(ns_name):
     else:
         return 0
 
-with open(filename,) as f:
+
+with open(filename, ) as f:
     yamldocs = yaml.load_all(f, Loader=yaml.FullLoader)
     for yamldoc in yamldocs:
         objtype = yamldoc["kind"]
@@ -192,51 +205,52 @@ with open(filename,) as f:
         cluster = yamldoc["metadata"]["cluster"]
         spec = yamldoc["spec"]
         s = "Global"
-        s=requests.Session()
-        s.verify=False
+        s = requests.Session()
+        s.verify = False
 
         # Connect to VCenter and start a session
-        vcsession = s.post('https://'+vcip+'/rest/com/vmware/cis/session',auth=(userid,password))
+        vcsession = s.post('https://' + vcip + '/rest/com/vmware/cis/session', auth=(userid, password))
         if not vcsession.ok:
-            print ("Session creation is failed, please check vcenter connection")
+            print("Session creation is failed, please check vcenter connection")
             sys.exit()
         token = json.loads(vcsession.text)["value"]
-        token_header = {'vmware-api-session-id': token }
+        token_header = {'vmware-api-session-id': token}
 
         # Based on the datacenter get all datacenters
-        datacenter_object=s.get('https://'+vcip+'/rest/vcenter/datacenter?filter.names='+datacenter)
-        if len(json.loads(datacenter_object.text)["value"])==0:
-            print ("No datacenter found, please enter valid datacenter name")
+        datacenter_object = s.get('https://' + vcip + '/rest/vcenter/datacenter?filter.names=' + datacenter)
+        if len(json.loads(datacenter_object.text)["value"]) == 0:
+            print("No datacenter found, please enter valid datacenter name")
             sys.exit()
-        datacenter_id=json.loads(datacenter_object.text)["value"][0].get("datacenter")
+        datacenter_id = json.loads(datacenter_object.text)["value"][0].get("datacenter")
 
         # Based on the cluster name get the cluster_id
-        cluster_object=s.get('https://'+vcip+'/rest/vcenter/cluster?filter.names='+cluster+'&filter.datacenters='+datacenter_id)
-        if len(json.loads(cluster_object.text)["value"])==0:
-            print ("No cluster found, please enter valid cluster name")
+        cluster_object = s.get(
+            'https://' + vcip + '/rest/vcenter/cluster?filter.names=' + cluster + '&filter.datacenters=' + datacenter_id)
+        if len(json.loads(cluster_object.text)["value"]) == 0:
+            print("No cluster found, please enter valid cluster name")
             sys.exit()
-        cluster_id=json.loads(cluster_object.text)["value"][0].get("cluster")
+        cluster_id = json.loads(cluster_object.text)["value"][0].get("cluster")
 
         if verb == "create":
 
-            ################ create wcpCluster
+            # create wcpCluster
             if objtype == "wcpCluster":
                 del yamldoc["kind"]
                 del yamldoc["metadata"]
-                if check_wcp_cluster_compatibility(cluster_id):  
+                if check_wcp_cluster_compatibility(cluster_id):
                     if not check_wcp_cluster_status(cluster_id):
-                        
+
                         temp1 = get_storage_policy(yamldoc["spec"].get("ephemeral_storage_policy"))
                         if not temp1:
-                            print ("wcpCluster/"+cluster+" check value for ephemeral_storage_policy")
+                            print("wcpCluster/" + cluster + " check value for ephemeral_storage_policy")
                             sys.exit()
                         temp2 = get_storage_policy(yamldoc["spec"].get("master_storage_policy"))
                         if not temp2:
-                            print ("wcpCluster/"+cluster+" check value for master_storage_policy")
+                            print("wcpCluster/" + cluster + " check value for master_storage_policy")
                             sys.exit()
                         temp3 = get_storage_policy(yamldoc["spec"]["image_storage"].get("storage_policy"))
                         if not temp3:
-                            print ("wcpCluster/"+cluster+" check value for storage_policy")
+                            print("wcpCluster/" + cluster + " check value for storage_policy")
                             sys.exit()
                         temp4 = get_content_library(yamldoc["spec"].get("default_kubernetes_service_content_library"))
                         if not temp4:
@@ -244,46 +258,46 @@ with open(filename,) as f:
                             sys.exit()
                         temp5 = get_mgmt_network(yamldoc["spec"]["master_management_network"].get("network"), datacenter_id)  
                         if not temp5:
-                            print ("wcpCluster/"+cluster+" check value for master_management_network - network")
+                            print("wcpCluster/" + cluster + " check value for master_management_network - network")
                             sys.exit()
                         temp6 = get_nsx_switch(cluster_id)
                         if not temp6:
-                            print ("wcpCluster/"+cluster+" no compatiable NSX switch for cluster")
+                            print("wcpCluster/" + cluster + " no compatiable NSX switch for cluster")
                             sys.exit()
                         temp7 = get_nsx_edge_cluster(cluster_id, temp6)
                         if not temp7:
-                            print ("wcpCluster/"+cluster+" no compatiable NSX edge cluster")
+                            print("wcpCluster/" + cluster + " no compatiable NSX edge cluster")
                             sys.exit()
-                        
-                        #Update any of the above is 0 then quit
-                
-                        yamldoc["spec"].update({"ephemeral_storage_policy": temp1}) 
+
+                        # Update any of the above is 0 then quit
+
+                        yamldoc["spec"].update({"ephemeral_storage_policy": temp1})
                         yamldoc["spec"].update({"master_storage_policy": temp2})
                         yamldoc["spec"]["image_storage"].update({"storage_policy": temp3})
-                        yamldoc["spec"].update({"default_kubernetes_service_content_library": temp4}) 
+                        yamldoc["spec"].update({"default_kubernetes_service_content_library": temp4})
                         yamldoc["spec"]["master_management_network"].update({"network": temp5})
                         yamldoc["spec"]["ncp_cluster_network_spec"].update({"cluster_distributed_switch": temp6})
                         yamldoc["spec"]["ncp_cluster_network_spec"].update({"nsx_edge_cluster": temp7})
-                        
+
                         json_payload = json.loads(json.dumps(yamldoc["spec"]))
                         json_response = s.post('https://'+vcip+'/api/vcenter/namespace-management/clusters/'+cluster_id+'?action=enable', headers=headers,json=json_payload)
                         if json_response.ok:
-                            print ("wcpCluster/"+cluster+" creation started")
+                            print("wcpCluster/" + cluster + " creation started")
                         else:
-                            print ("wcpCluster/"+cluster+" creation failed")
-                            print (json_response.text)
+                            print("wcpCluster/" + cluster + " creation failed")
+                            print(json_response.text)
                     else:
                         print ("wcpCluster/"+cluster+" already operational at https://"+check_wcp_cluster_status(cluster_id))
                 else:
-                    print ("wcpCluster/"+cluster+" not compatiable")
+                    print("wcpCluster/" + cluster + " not compatiable")
 
-            ################ create wcpRegistry
+            # create wcpRegistry
             if objtype == "wcpRegistry":
                 if not check_wcp_harbor_status(cluster_id):
                     del yamldoc["kind"]
                     del yamldoc["metadata"]
-                    client_token=generate_random_uuid()
-                    yamldoc.update({"client_token": client_token}) 
+                    client_token = generate_random_uuid()
+                    yamldoc.update({"client_token": client_token})
                     yamldoc["spec"].update({"cluster": cluster_id})
                     reg_creation_started = 0
                     i = 0
@@ -293,29 +307,29 @@ with open(filename,) as f:
                         if temp1:
                             yamldoc["spec"]["storage"][i].update({"policy": temp1})
                         else:
-                            print ("wcpNamespace/"+spec["namespace"]+" invalid storage policy specified")
+                            print("wcpNamespace/" + spec["namespace"] + " invalid storage policy specified")
                             sys.exit()
-                        i = i+1
+                        i = i + 1
                     json_payload = json.loads(json.dumps(yamldoc))
                     headers.update({'vmware-api-session-id': token})
                     json_response = s.post('https://'+vcip+'/rest/vcenter/content/registries/harbor',headers=headers,json=json_payload)
                     if json_response.ok:
-                        print ("wcpRegistry/Harbor creation started")
+                        print("wcpRegistry/Harbor creation started")
                         reg_creation_started = 1
                     else:
-                        print ("wcpRegistry/Harbor failed")
-                        print (json_response.text)    
+                        print("wcpRegistry/Harbor failed")
+                        print(json_response.text)
 
                     if reg_creation_started == 1:
                         while not check_wcp_harbor_ui_url_status(cluster_id):
                             print("Sleeping for 20 sec...")
                             time.sleep(20)
-                    print("wcpRegistry/Harbor access URL "+check_wcp_harbor_ui_url_status(cluster_id))
+                    print("wcpRegistry/Harbor access URL " + check_wcp_harbor_ui_url_status(cluster_id))
                 else:
                     print("wcpRegistry/Harbor already running")
-                
-            ################ create wcpNamespace
-            if objtype == "wcpNamespace":                
+
+            # create wcpNamespace
+            if objtype == "wcpNamespace":
                 if not check_wcp_ns_status(spec["namespace"]):
                     spec.update({"cluster": cluster_id})
                     i = 0
@@ -325,114 +339,114 @@ with open(filename,) as f:
                         if temp1:
                             spec["storage_specs"][i].update({"policy": temp1})
                         else:
-                            print ("wcpNamespace/"+spec["namespace"]+" invalid storage policy specified")
+                            print("wcpNamespace/" + spec["namespace"] + " invalid storage policy specified")
                             sys.exit()
-                        i = i+1
+                        i = i + 1
                     json_payload = json.loads(json.dumps(spec))
                     json_response = s.post('https://'+vcip+'/api/vcenter/namespaces/instances',headers=headers,json=json_payload)
                     if json_response.ok:
-                        print("wcpNamespace/"+spec["namespace"]+" created") 
+                        print("wcpNamespace/" + spec["namespace"] + " created")
                     else:
-                        print("wcpNamespace/"+spec["namespace"]+" creation failed")
+                        print("wcpNamespace/" + spec["namespace"] + " creation failed")
                         print(json_response.text)
                 else:
-                    print("wcpNamespace/"+spec["namespace"]+" already exists. No changes made")
-            
-            ################ create wcpContentLibrary
+                    print("wcpNamespace/" + spec["namespace"] + " already exists. No changes made")
+
+            # create wcpContentLibrary
             if objtype == "wcpContentLibrary":
                 if not get_content_library(yamldoc["spec"].get("name")):
                     del yamldoc["kind"]
                     del yamldoc["metadata"]
-                    client_token=generate_random_uuid()
+                    client_token = generate_random_uuid()
                     yamldoc.update({"client_token": client_token})
                     i = 0
                     for sb in yamldoc["spec"]["storage_backings"]:
-                        temp1 = get_storage_id(sb["datastore_id"],datacenter_id)
+                        temp1 = get_storage_id(sb["datastore_id"], datacenter_id)
                         if temp1:
                             yamldoc["spec"]["storage_backings"][i].update({"datastore_id": temp1})
                         else:
-                            print ("wcpContentLibrary invalid storage name specified")
+                            print("wcpContentLibrary invalid storage name specified")
                             sys.exit()
-                        i = i+1
+                        i = i + 1
                     yamldoc["create_spec"] = yamldoc.pop("spec")
                     json_payload = json.loads(json.dumps(yamldoc))
                     headers.update({'vmware-api-session-id': token})
                     json_response = s.post('https://'+vcip+'/rest/com/vmware/content/subscribed-library',headers=headers,json=json_payload)
                     if json_response.ok:
-                        print ("wcpContentLibrary/Subscribed_library created")
+                        print("wcpContentLibrary/Subscribed_library created")
                     else:
-                        print ("wcpContentLibrary/Subscribed_library created")
-                        print (json_response.text)    
+                        print("wcpContentLibrary/Subscribed_library created")
+                        print(json_response.text)
                 else:
-                    print("wcpContentLibrary/Subscribed_library already running")                
+                    print("wcpContentLibrary/Subscribed_library already running")
 
         elif verb == "delete":
 
-            ################ delete wcpCluster
+            # delete wcpCluster
             if objtype == "wcpCluster":
                 if check_wcp_cluster_status(cluster_id):
                     # Check if you want to delete ???
                     json_response = s.post('https://'+vcip+'/api/vcenter/namespace-management/clusters/'+cluster_id+'?action=disable')
                     if json_response.ok:
-                        print ("wcpCluster/"+cluster+" delete initiated")
+                        print("wcpCluster/" + cluster + " delete initiated")
                     else:
-                        print ("wcpCluster/"+cluster+" delete failed")
-                        print (json_response.text)
+                        print("wcpCluster/" + cluster + " delete failed")
+                        print(json_response.text)
                 else:
-                    print ("wcpCluster/"+cluster+" not operational")  
+                    print("wcpCluster/" + cluster + " not operational")
 
-            ################ delete wcpRegistry
+            # delete wcpRegistry
             if objtype == "wcpRegistry":
                 reg_destruction_started = 0
                 harbor_id = check_wcp_harbor_status(cluster_id)
                 if harbor_id:
                     json_response = s.delete('https://'+vcip+'/rest/vcenter/content/registries/harbor/'+harbor_id, headers=token_header)
                     if (json_response.ok):
-                        print ("wcpRegistry/Harbor deletion started")
+                        print("wcpRegistry/Harbor deletion started")
                         reg_destruction_started = 1
                     else:
-                        print ("wcpRegistry/Harbor deletion failed")
-                        print (json_response.text)
-                    
+                        print("wcpRegistry/Harbor deletion failed")
+                        print(json_response.text)
+
                     if reg_destruction_started == 1:
                         while check_wcp_harbor_status(cluster_id):
                             print("Sleeping for 20 sec...")
                             time.sleep(20)
                 else:
-                    print ("wcpRegistry/Harbor not found")
+                    print("wcpRegistry/Harbor not found")
 
-            ################ delete wcpNamespace    
+            # delete wcpNamespace
             if objtype == "wcpNamespace":
-                json_response = s.delete('https://'+vcip+'/api/vcenter/namespaces/instances/'+spec["namespace"])
+                json_response = s.delete('https://' + vcip + '/api/vcenter/namespaces/instances/' + spec["namespace"])
                 if (json_response.ok):
-                    print ("wcpNamespace/"+spec["namespace"]+" deleted")
+                    print("wcpNamespace/" + spec["namespace"] + " deleted")
                 else:
-                    print ("wcpNamespace/"+spec["namespace"]+" deletion failed")
-                    print (json_response.text)
+                    print("wcpNamespace/" + spec["namespace"] + " deletion failed")
+                    print(json_response.text)
 
-            ################ delete wcpContentLibrary    
+            # delete wcpContentLibrary
             if objtype == "wcpContentLibrary":
                 contentlibrary_id = get_content_library(yamldoc["spec"].get("name"))
                 if contentlibrary_id:
                     json_response = s.delete('https://'+vcip+'/rest/com/vmware/content/subscribed-library/id:'+contentlibrary_id)
                     if (json_response.ok):
-                        print ("wcpContentLibrary/Subscribed_library successfully deleted")
+                        print("wcpContentLibrary/Subscribed_library successfully deleted")
                     else:
-                        print ("wcpContentLibrary/Subscribed_library deletion failed")
+                        print("wcpContentLibrary/Subscribed_library deletion failed")
                         result = json.loads(json_response.text)
-                        print(json.dumps(result,indent=2,sort_keys=True))
+                        print(json.dumps(result, indent=2, sort_keys=True))
                 else:
-                    print ("wcpContentLibrary/Subscribed library not found")
+                    print("wcpContentLibrary/Subscribed library not found")
 
         elif verb == "apply":
 
-            ################ apply wcpCluster
+            # apply wcpCluster
             if objtype == "wcpCluster":
                 del yamldoc["kind"]
                 del yamldoc["metadata"]
-                if check_wcp_cluster_compatibility(cluster_id):  
+                if check_wcp_cluster_compatibility(cluster_id):
                     if not check_wcp_cluster_status(cluster_id):
-                        
+
                         temp1 = get_storage_policy(yamldoc["spec"].get("ephemeral_storage_policy"))
                         temp2 = get_storage_policy(yamldoc["spec"].get("master_storage_policy"))
                         temp3 = get_storage_policy(yamldoc["spec"]["image_storage"].get("storage_policy"))
@@ -441,36 +455,35 @@ with open(filename,) as f:
                         temp6 = get_nsx_switch(cluster_id)
                         temp7 = get_nsx_edge_cluster(cluster_id, temp6)
 
-                        #Update any of the above is 0 then quit
-                
-                        yamldoc["spec"].update({"ephemeral_storage_policy": temp1}) 
+                        # Update any of the above is 0 then quit
+
+                        yamldoc["spec"].update({"ephemeral_storage_policy": temp1})
                         yamldoc["spec"].update({"master_storage_policy": temp2})
                         yamldoc["spec"]["image_storage"].update({"storage_policy": temp3})
-                        yamldoc["spec"].update({"default_kubernetes_service_content_library": temp4}) 
+                        yamldoc["spec"].update({"default_kubernetes_service_content_library": temp4})
                         yamldoc["spec"]["master_management_network"].update({"network": temp5})
                         yamldoc["spec"]["ncp_cluster_network_spec"].update({"nsx_edge_cluster": temp6})
                         yamldoc["spec"]["ncp_cluster_network_spec"].update({"cluster_distributed_switch": temp7})
-                
+
                         json_payload = json.loads(json.dumps(yamldoc["spec"]))
                         json_response = s.post('https://'+vcip+'/api/vcenter/namespace-management/clusters/'+cluster_id+'?action=enable', headers=headers,json=json_payload)
                         if json_response.ok:
-                            print ("wcpCluster/"+cluster+" creation started")
+                            print("wcpCluster/" + cluster + " creation started")
                         else:
-                            print ("wcpCluster/"+cluster+" creation failed")
-                            print (json_response.text)
+                            print("wcpCluster/" + cluster + " creation failed")
+                            print(json_response.text)
                     else:
                         print ("wcpCluster/"+cluster+" already operational at https://"+check_wcp_cluster_status(cluster_id))
                 else:
-                    print ("wcpCluster/"+cluster+" not compatiable")
+                    print("wcpCluster/" + cluster + " not compatiable")
 
-
-                 # TO DO : stub to patch server
-                 #   json_response = s.patch('https://'+vcip+'/api/vcenter/namespace-management/clusters/'+cluster_id, headers=headers,json=json_payload)
-                 #   if json_response.ok:
-                 #       print ("wcpCluster/"+cluster+" updated")
-                 #   else:
-                 #       print ("wcpCluster/"+cluster+" update failed")
-                 #       print (json_response.text)
+                # TO DO : stub to patch server
+                #   json_response = s.patch('https://'+vcip+'/api/vcenter/namespace-management/clusters/'+cluster_id, headers=headers,json=json_payload)
+                #   if json_response.ok:
+                #       print ("wcpCluster/"+cluster+" updated")
+                #   else:
+                #       print ("wcpCluster/"+cluster+" update failed")
+                #       print (json_response.text)
 
                 # To rotate password
                 #   json_response = s.post('https://'+vcip+'/api/vcenter/namespace-management/clusters/'+cluster_id+'?action=rotate_password')
@@ -479,16 +492,16 @@ with open(filename,) as f:
                 #   else:
                 #       print ("wcpCluster/"+cluster+" password rotation failed")
                 #       print (json_response.text)
-                             
-            ################ apply wcpRegistry
+
+            # apply wcpRegistry
             if objtype == "wcpRegistry":
-                #same as create as no modify option
+                # same as create as no modify option
                 if not check_wcp_harbor_status(cluster_id):
                     del yamldoc["kind"]
                     del yamldoc["metadata"]
-                    client_token=generate_random_uuid()
-                    yamldoc.update({"client_token": client_token}) 
-                    yamldoc["spec"].update({"cluster": cluster_id}) 
+                    client_token = generate_random_uuid()
+                    yamldoc.update({"client_token": client_token})
+                    yamldoc["spec"].update({"cluster": cluster_id})
                     i = 0
                     # Update variables and proceed
                     for sp in yamldoc["spec"]["storage"]:
@@ -496,28 +509,28 @@ with open(filename,) as f:
                         if temp1:
                             yamldoc["spec"]["storage"][i].update({"policy": temp1})
                         else:
-                            print ("wcpNamespace/"+spec["namespace"]+" invalid storage policy specified")
+                            print("wcpNamespace/" + spec["namespace"] + " invalid storage policy specified")
                             sys.exit()
-                        i = i+1
+                        i = i + 1
                     json_payload = json.loads(json.dumps(yamldoc))
                     headers.update({'vmware-api-session-id': token})
                     json_response = s.post('https://'+vcip+'/rest/vcenter/content/registries/harbor',headers=headers,json=json_payload)
                     if json_response.ok:
-                        print ("wcpRegistry/Harbor created")
+                        print("wcpRegistry/Harbor created")
                         reg_creation_started = 1
                     else:
-                        print ("wcpRegistry/Harbor failed")
-                        print (json_response.text)
+                        print("wcpRegistry/Harbor failed")
+                        print(json_response.text)
 
                     if reg_creation_started == 1:
                         while not check_wcp_harbor_ui_url_status(cluster_id):
                             print("Sleeping for 20 sec...")
                             time.sleep(20)
-                    print("wcpRegistry/Harbor access URL "+check_wcp_harbor_ui_url_status(cluster_id))
+                    print("wcpRegistry/Harbor access URL " + check_wcp_harbor_ui_url_status(cluster_id))
                 else:
                     print("wcpRegistry/Harbor already running")
 
-            ################ apply wcpNamespace
+            # apply wcpNamespace
             if objtype == "wcpNamespace":
                 if check_wcp_ns_status(spec["namespace"]):
                     spec.update({"cluster": cluster_id})
@@ -528,16 +541,16 @@ with open(filename,) as f:
                         if temp1:
                             spec["storage_specs"][i].update({"policy": temp1})
                         else:
-                            print ("wcpNamespace/"+spec["namespace"]+" invalid storage policy specified")
+                            print("wcpNamespace/" + spec["namespace"] + " invalid storage policy specified")
                             sys.exit()
-                        i = i+1
+                        i = i + 1
                     json_payload = json.loads(json.dumps(spec))
                     json_response = s.put('https://'+vcip+'/api/vcenter/namespaces/instances/'+spec["namespace"],headers=headers,json=json_payload)
                     if json_response.ok:
-	                    print ("wcpNamespace/"+spec["namespace"]+" updated")
+                        print("wcpNamespace/" + spec["namespace"] + " updated")
                     else:
-                        print ("wcpNamespace/"+spec["namespace"]+" update failed")
-                        print (json_response.text)
+                        print("wcpNamespace/" + spec["namespace"] + " update failed")
+                        print(json_response.text)
                 else:
                     spec.update({"cluster": cluster_id})
                     i = 0
@@ -547,75 +560,75 @@ with open(filename,) as f:
                         if temp1:
                             spec["storage_specs"][i].update({"policy": temp1})
                         else:
-                            print ("wcpNamespace/"+spec["namespace"]+" invalid storage policy specified")
+                            print("wcpNamespace/" + spec["namespace"] + " invalid storage policy specified")
                             sys.exit()
-                        i = i+1
+                        i = i + 1
                     json_payload = json.loads(json.dumps(spec))
                     json_response = s.post('https://'+vcip+'/api/vcenter/namespaces/instances',headers=headers,json=json_payload)
                     if json_response.ok:
-	                    print ("wcpNamespace/"+spec["namespace"]+" created")
+                        print("wcpNamespace/" + spec["namespace"] + " created")
                     else:
-                        print ("wcpNamespace/"+spec["namespace"]+" creation failed")
-                        print (json_response.text)
+                        print("wcpNamespace/" + spec["namespace"] + " creation failed")
+                        print(json_response.text)
 
-            ################ apply wcpContentLibrary
+            # apply wcpContentLibrary
             if objtype == "wcpContentLibrary":
                 if not get_content_library(yamldoc["spec"].get("name")):
                     del yamldoc["kind"]
                     del yamldoc["metadata"]
-                    client_token=generate_random_uuid()
+                    client_token = generate_random_uuid()
                     yamldoc.update({"client_token": client_token})
                     i = 0
                     for sb in yamldoc["spec"]["storage_backings"]:
-                        temp1 = get_storage_id(sb["datastore_id"],datacenter_id)
+                        temp1 = get_storage_id(sb["datastore_id"], datacenter_id)
                         if temp1:
                             yamldoc["spec"]["storage_backings"][i].update({"datastore_id": temp1})
                         else:
-                            print ("wcpContentLibrary invalid storage name specified")
+                            print("wcpContentLibrary invalid storage name specified")
                             sys.exit()
-                        i = i+1
+                        i = i + 1
                     yamldoc["create_spec"] = yamldoc.pop("spec")
                     json_payload = json.loads(json.dumps(yamldoc))
                     headers.update({'vmware-api-session-id': token})
                     json_response = s.post('https://'+vcip+'/rest/com/vmware/content/subscribed-library',headers=headers,json=json_payload)
                     if json_response.ok:
-                        print ("wcpContentLibrary/Subscribed_library created")
+                        print("wcpContentLibrary/Subscribed_library created")
                     else:
-                        print ("wcpContentLibrary/Subscribed_library created")
-                        print (json_response.text)    
+                        print("wcpContentLibrary/Subscribed_library created")
+                        print(json_response.text)
                 else:
-                    print("wcpContentLibrary/Subscribed_library already running")                
+                    print("wcpContentLibrary/Subscribed_library already running")
 
         elif verb == 'describe':
 
-            ################ describe wcpCluster
+            # describe wcpCluster
             if objtype == "wcpCluster":
                 if check_wcp_cluster_status(cluster_id):
                     json_response = s.get('https://'+vcip+'/api/vcenter/namespace-management/clusters/'+cluster_id)
                     if json_response.ok:
                         result = json.loads(json_response.text)
-                        print(json.dumps(result,indent=2,sort_keys=True))
+                        print(json.dumps(result, indent=2, sort_keys=True))
                     else:
-                        print("wcpCluster/"+cluster+" error describing")
+                        print("wcpCluster/" + cluster + " error describing")
                 else:
-                    print("wcpCluster/"+cluster+" not ready")
-                    
-            ################ describe wcpRegistry
+                    print("wcpCluster/" + cluster + " not ready")
+
+            # describe wcpRegistry
             if objtype == "wcpRegistry":
                 harbor_id = check_wcp_harbor_status(cluster_id)
                 if harbor_id:
-                    json_response = s.get('https://'+vcip+'/rest/vcenter/content/registries/harbor/'+harbor_id)
+                    json_response = s.get('https://' + vcip + '/rest/vcenter/content/registries/harbor/' + harbor_id)
                     if (json_response.ok):
                         result = json.loads(json_response.text)
-                        print(json.dumps(result,indent=2,sort_keys=True))
+                        print(json.dumps(result, indent=2, sort_keys=True))
                     else:
-                        print ("wcpRegistry/Harbor error describing")
+                        print("wcpRegistry/Harbor error describing")
                 else:
-                    print ("wcpRegistry/Harbor not found")
+                    print("wcpRegistry/Harbor not found")
 
-            ################ describe wcpNamespace
+            # describe wcpNamespace
             if objtype == "wcpNamespace":
-                json_response = s.get('https://'+vcip+'/api/vcenter/namespaces/instances')
+                json_response = s.get('https://' + vcip + '/api/vcenter/namespaces/instances')
                 if (json_response.ok):
                     results = json.loads(json_response.text)
                     for result in results:
@@ -623,24 +636,24 @@ with open(filename,) as f:
                             json_response = s.get('https://'+vcip+'/api/vcenter/namespaces/instances/'+result["namespace"])
                             if (json_response.ok):
                                 nsresult = json.loads(json_response.text)
-                                print(json.dumps(nsresult,indent=2,sort_keys=True))
+                                print(json.dumps(nsresult, indent=2, sort_keys=True))
                             else:
-                                print ("wcpNamespace"+result["namespace"]+" error describing")
+                                print("wcpNamespace" + result["namespace"] + " error describing")
                 else:
-                    print ("wcpNamespace error describing")
+                    print("wcpNamespace error describing")
 
-            ################ describe wcpContentLibrary
+            # describe wcpContentLibrary
             if objtype == "wcpContentLibrary":
                 contentlibrary_id = get_content_library(yamldoc["spec"].get("name"))
                 if contentlibrary_id:
                     json_response = s.get('https://'+vcip+'/rest/com/vmware/content/subscribed-library/id:'+contentlibrary_id)
                     if (json_response.ok):
                         result = json.loads(json_response.text)
-                        print(json.dumps(result,indent=2,sort_keys=True))
+                        print(json.dumps(result, indent=2, sort_keys=True))
                     else:
-                        print ("wcpContentLibrary/Subscribed library error describing")
+                        print("wcpContentLibrary/Subscribed library error describing")
                 else:
-                    print ("wcpContentLibrary/Subscribed library not found")
+                    print("wcpContentLibrary/Subscribed library not found")
 
         # Clean up and exit...
-        session_delete=s.delete('https://'+vcip+'/rest/com/vmware/cis/session',auth=(userid,password))
+        session_delete = s.delete('https://' + vcip + '/rest/com/vmware/cis/session', auth=(userid, password))
