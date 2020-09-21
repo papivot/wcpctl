@@ -5,17 +5,6 @@ metadata:
   datacenter: Pacific-Datacenter                        
   cluster: Workload-Cluster                             
 spec:
-  workload_networks_spec:
-    supervisor_primary_workload_network:
-      network: network-1
-      network_provider: VSPHERE_NETWORK
-      vsphere_network:
-        address_ranges:
-        - address: 192.168.140.10                             # Change this
-          count: 90                                           # Change this
-        gateway: 192.168.140.1                                # Change this
-        portgroup: Workload0          
-        subnet_mask: 255.255.254.0                            # Change this
   service_cidr:
     address: 10.96.0.0
     prefix: 24
@@ -45,6 +34,7 @@ spec:
   size_hint: TINY                                             
   login_banner:
   default_kubernetes_service_content_library: Kubernetes      # Change this
+  # Networking details follow - 
   load_balancer_config_spec:
     address_ranges:
     - address: 192.168.141.1                                  # Change this
@@ -70,3 +60,14 @@ spec:
       password: VMware1VMware1
     id: haproxy-1
     provider: HA_PROXY
+  workload_networks_spec:
+    supervisor_primary_workload_network:
+      network: network-1
+      network_provider: VSPHERE_NETWORK
+      vsphere_network:
+        address_ranges:
+        - address: 192.168.140.10                             # Change this
+          count: 90                                           # Change this
+        gateway: 192.168.140.1                                # Change this
+        portgroup: Workload0          
+        subnet_mask: 255.255.254.0                            # Change this
