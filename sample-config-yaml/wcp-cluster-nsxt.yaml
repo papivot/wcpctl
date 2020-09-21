@@ -5,18 +5,6 @@ metadata:
   datacenter: Pacific-Datacenter                        
   cluster: Workload-Cluster                             
 spec:
-  ncp_cluster_network_spec:
-    nsx_edge_cluster:                                   # LEAVE BLANK
-    cluster_distributed_switch:                         # LEAVE BLANK
-    egress_cidrs:
-    - address: 110.193.222.128
-      prefix: 26                                        
-    ingress_cidrs:
-    - address: 10.193.222.64
-      prefix: 26                                        
-    pod_cidrs:
-    - address: 10.244.0.0                               
-      prefix: 21                                        
   service_cidr:
     address: 10.96.0.0                                  
     prefix: 24                                          
@@ -46,3 +34,16 @@ spec:
   size_hint: TINY
   login_banner:
   default_kubernetes_service_content_library: Kubernetes 
+  # Networking details - 
+  ncp_cluster_network_spec:
+    nsx_edge_cluster:                                   # LEAVE BLANK
+    cluster_distributed_switch:                         # LEAVE BLANK
+    egress_cidrs:
+    - address: 110.193.222.128
+      prefix: 26                                        
+    ingress_cidrs:
+    - address: 10.193.222.64
+      prefix: 26                                        
+    pod_cidrs:
+    - address: 10.244.0.0                               
+      prefix: 21                                        
