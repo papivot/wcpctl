@@ -11,62 +11,52 @@ spec:
       network_provider: VSPHERE_NETWORK
       vsphere_network:
         address_ranges:
-        - address: 192.168.140.10
-          count: 90
-        gateway: 192.168.140.1
-        portgroup: Workload0
-        subnet_mask: 255.255.254.0  
+        - address: 192.168.140.10                             # Change this
+          count: 90                                           # Change this
+        gateway: 192.168.140.1                                # Change this
+        portgroup: Workload0          
+        subnet_mask: 255.255.254.0                            # Change this
   service_cidr:
     address: 10.96.0.0
     prefix: 24
   worker_DNS:
-  - 192.168.4.1
+  - 192.168.4.1                                               # Change this
   master_DNS:
-  - 192.168.4.1
+  - 192.168.4.1                                               # Change this
   master_DNS_search_domains:
-  - env4.lab.local
+  - env4.lab.local                                            # Change this
   master_NTP_servers:
-  - 10.192.2.5
+  - 10.192.2.5                                                # Change this
   Master_DNS_names:
-  - wcp.env4.lab.local
+  - wcp.env4.lab.local                                        # Change this
   master_management_network:
     address_range:
-      gateway: 192.168.4.1
-      starting_address: 192.168.4.70
-      subnet_mask: 255.255.255.0
-      address_count: 5
+      gateway: 192.168.4.1                                    # Change this
+      starting_address: 192.168.4.70                          # Change this
+      subnet_mask: 255.255.255.0                              # Change this
+      address_count: 5                     
     mode: STATICRANGE
-    network: "DVPG-Management Network"
-  ephemeral_storage_policy: pacific-gold-storage-policy
+    network: "DVPG-Management Network"                        # Change this
+  ephemeral_storage_policy: pacific-gold-storage-policy       # Change this    
   image_storage:
-    storage_policy: pacific-gold-storage-policy
-  master_storage_policy: pacific-gold-storage-policy
-  network_provider: VSPHERE_NETWORK
-  size_hint: TINY
+    storage_policy: pacific-gold-storage-policy               # Change this
+  master_storage_policy: pacific-gold-storage-policy          # Change this
+  network_provider: VSPHERE_NETWORK                           
+  size_hint: TINY                                             
   login_banner:
-  default_kubernetes_service_content_library: Kubernetes
+  default_kubernetes_service_content_library: Kubernetes      # Change this
   load_balancer_config_spec:
     address_ranges:
-    - address: 192.168.141.1
-      count: 99
+    - address: 192.168.141.1                                  # Change this
+      count: 99                                               # Change this
     ha_proxy_config_create_spec:
       certificate_authority_chain: |
         -----BEGIN CERTIFICATE-----
         MIIDnzCCAoegAwIBAgIJAOirI4Oyj91dMA0GCSqGSIb3DQEBBQUAMG0xCzAJBgNV
         BAYTAlVTMRMwEQYDVQQIDApDYWxpZm9ybmlhMRIwEAYDVQQHDAlQYWxvIEFsdG8x
         DzANBgNVBAoMBlZNd2FyZTENMAsGA1UECwwEQ0FQVjEVMBMGA1UEAwwMMTkyLjE2
-        OC40LjU3MB4XDTIwMDkxNzIwMDAxMFoXDTMwMDkxNTIwMDAxMFowbTELMAkGA1UE
-        BhMCVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExEjAQBgNVBAcMCVBhbG8gQWx0bzEP
         MA0GA1UECgwGVk13YXJlMQ0wCwYDVQQLDARDQVBWMRUwEwYDVQQDDAwxOTIuMTY4
-        LjQuNTcwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC/pFmWSbhob5R0
-        KeiIvof1PzLErnEibMKw8bXSsO1CaXDLEMNeogDbMVUO7Jsn6fPKJLuyFRSCudPw
-        QbdDgQc7xiBeSpzgcI+18oXp/Uh1aDI5R97aamxAf7DTIOmWrwgWXbgVM5egAQfw
-        mkqj+lMDQdDaPFZh0L8B/IG+ADVr/XXvk9F8ubN7Qx0vOuT3UUtyXoi18wNX6Fva
-        XhjfBhcNn8Dl8D8AoSLvAK0zw2PYeyZq/PqSS2m5flB1sDL+zaDoi9Ds4gc27773
-        npOuoyg1dnXSy77GS4j12bjiG6/V5Kze8NI529kYc0C26nP5/NtjLcdaop3Vh+TJ
-        5ZsJAImTAgMBAAGjQjBAMA8GA1UdEwEB/wQFMAMBAf8wDgYDVR0PAQH/BAQDAgGG
-        MB0GA1UdDgQWBBSsyTrWF+B8B9zmb7GZMRnkyFbaPDANBgkqhkiG9w0BAQUFAAOC
-        AQEAEKCT3/9UPPY0Yc1Y/uAumJmxHhjNkrmUg7HV15gnM3nI3v1rC874u5F+8k/n
+        ...
         yRkE88bQsSMnLYb1K66ksS0xnWJgM7gX3u8LHLPX91HKFFyseApsTU37PEMwXMs2
         U1wXUHxm/d7EGuRaAbu+huWd3prquEkAoOzXbcvM7QH//2tg/S28InL2lstIrOC7
         9ua9o0kvfa4fMyZtKQsfYe5556msWA+uqyAnZG786HMrf2Vb6udzFqvYgDZZpxNK
@@ -74,7 +64,7 @@ spec:
         8IWX74o2WgoxABV/jPtxU+WcIg==
         -----END CERTIFICATE-----
       servers:
-      - host: 192.168.4.57
+      - host: 192.168.4.57                                    # Change this
         port: 5556
       username: admin
       password: VMware1VMware1
