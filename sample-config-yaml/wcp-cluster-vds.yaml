@@ -1,0 +1,82 @@
+---
+kind: wcpCluster
+metadata:
+  vcenter: 192.168.4.50
+  datacenter: Pacific-Datacenter                        
+  cluster: Workload-Cluster                             
+spec:
+  workload_networks_spec:
+    supervisor_primary_workload_network:
+      network: network-1
+      network_provider: VSPHERE_NETWORK
+      vsphere_network:
+        address_ranges:
+        - address: 192.168.140.10
+          count: 90
+        gateway: 192.168.140.1
+        portgroup: Workload0
+        subnet_mask: 255.255.254.0  
+  service_cidr:
+    address: 10.96.0.0
+    prefix: 24
+  worker_DNS:
+  - 192.168.4.1
+  master_DNS:
+  - 192.168.4.1
+  master_DNS_search_domains:
+  - env4.lab.local
+  master_NTP_servers:
+  - 10.192.2.5
+  Master_DNS_names:
+  - wcp.env4.lab.local
+  master_management_network:
+    address_range:
+      gateway: 192.168.4.1
+      starting_address: 192.168.4.70
+      subnet_mask: 255.255.255.0
+      address_count: 5
+    mode: STATICRANGE
+    network: "DVPG-Management Network"
+  ephemeral_storage_policy: pacific-gold-storage-policy
+  image_storage:
+    storage_policy: pacific-gold-storage-policy
+  master_storage_policy: pacific-gold-storage-policy
+  network_provider: VSPHERE_NETWORK
+  size_hint: TINY
+  login_banner:
+  default_kubernetes_service_content_library: Kubernetes
+  load_balancer_config_spec:
+    address_ranges:
+    - address: 192.168.141.1
+      count: 99
+    ha_proxy_config_create_spec:
+      certificate_authority_chain: |
+        -----BEGIN CERTIFICATE-----
+        MIIDnzCCAoegAwIBAgIJAOirI4Oyj91dMA0GCSqGSIb3DQEBBQUAMG0xCzAJBgNV
+        BAYTAlVTMRMwEQYDVQQIDApDYWxpZm9ybmlhMRIwEAYDVQQHDAlQYWxvIEFsdG8x
+        DzANBgNVBAoMBlZNd2FyZTENMAsGA1UECwwEQ0FQVjEVMBMGA1UEAwwMMTkyLjE2
+        OC40LjU3MB4XDTIwMDkxNzIwMDAxMFoXDTMwMDkxNTIwMDAxMFowbTELMAkGA1UE
+        BhMCVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExEjAQBgNVBAcMCVBhbG8gQWx0bzEP
+        MA0GA1UECgwGVk13YXJlMQ0wCwYDVQQLDARDQVBWMRUwEwYDVQQDDAwxOTIuMTY4
+        LjQuNTcwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC/pFmWSbhob5R0
+        KeiIvof1PzLErnEibMKw8bXSsO1CaXDLEMNeogDbMVUO7Jsn6fPKJLuyFRSCudPw
+        QbdDgQc7xiBeSpzgcI+18oXp/Uh1aDI5R97aamxAf7DTIOmWrwgWXbgVM5egAQfw
+        mkqj+lMDQdDaPFZh0L8B/IG+ADVr/XXvk9F8ubN7Qx0vOuT3UUtyXoi18wNX6Fva
+        XhjfBhcNn8Dl8D8AoSLvAK0zw2PYeyZq/PqSS2m5flB1sDL+zaDoi9Ds4gc27773
+        npOuoyg1dnXSy77GS4j12bjiG6/V5Kze8NI529kYc0C26nP5/NtjLcdaop3Vh+TJ
+        5ZsJAImTAgMBAAGjQjBAMA8GA1UdEwEB/wQFMAMBAf8wDgYDVR0PAQH/BAQDAgGG
+        MB0GA1UdDgQWBBSsyTrWF+B8B9zmb7GZMRnkyFbaPDANBgkqhkiG9w0BAQUFAAOC
+        AQEAEKCT3/9UPPY0Yc1Y/uAumJmxHhjNkrmUg7HV15gnM3nI3v1rC874u5F+8k/n
+        yRkE88bQsSMnLYb1K66ksS0xnWJgM7gX3u8LHLPX91HKFFyseApsTU37PEMwXMs2
+        U1wXUHxm/d7EGuRaAbu+huWd3prquEkAoOzXbcvM7QH//2tg/S28InL2lstIrOC7
+        9ua9o0kvfa4fMyZtKQsfYe5556msWA+uqyAnZG786HMrf2Vb6udzFqvYgDZZpxNK
+        OTRjLe1Lv7s4R7R1+hvU3G0OjO+P+1Idxr2QSXiE9WjuCJGzMOOjshkc+5i9tpu5
+        8IWX74o2WgoxABV/jPtxU+WcIg==
+        -----END CERTIFICATE-----
+      servers:
+      - host: 192.168.4.57
+        port: 5556
+      username: admin
+      password: VMware1VMware1
+    id: haproxy-1
+    provider: HA_PROXY
