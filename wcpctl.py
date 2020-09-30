@@ -237,7 +237,7 @@ with open(filename, ) as f:
             if objtype == "wcpCluster":
                 del yamldoc["kind"]
                 del yamldoc["metadata"]
-                if check_wcp_cluster_compatibility(cluster_id):
+                if check_wcp_cluster_compatibility(cluster_id, yamldoc["spec"]["network_provider"]):
                     if not check_wcp_cluster_status(cluster_id):
 
                         temp1 = get_storage_policy(yamldoc["spec"].get("ephemeral_storage_policy"))
@@ -282,7 +282,7 @@ with open(filename, ) as f:
                                 sys.exit()
                             yamldoc["spec"]["workload_networks_spec"]["supervisor_primary_workload_network"]["vsphere_network"].update({"portgroup": temp6})
 
-                        # Update... any of the above is 0 then quit
+                        # Update ...if any of the above is 0 then quit
                         yamldoc["spec"].update({"ephemeral_storage_policy": temp1})
                         yamldoc["spec"].update({"master_storage_policy": temp2})
                         yamldoc["spec"]["image_storage"].update({"storage_policy": temp3})
@@ -454,7 +454,7 @@ with open(filename, ) as f:
             if objtype == "wcpCluster":
                 del yamldoc["kind"]
                 del yamldoc["metadata"]
-                if check_wcp_cluster_compatibility(cluster_id):
+                if check_wcp_cluster_compatibility(cluster_id, yamldoc["spec"]["network_provider"]):
                     if not check_wcp_cluster_status(cluster_id):
 
                         temp1 = get_storage_policy(yamldoc["spec"].get("ephemeral_storage_policy"))
@@ -462,8 +462,30 @@ with open(filename, ) as f:
                         temp3 = get_storage_policy(yamldoc["spec"]["image_storage"].get("storage_policy"))
                         temp4 = get_content_library(yamldoc["spec"].get("default_kubernetes_service_content_library"))
                         temp5 = get_mgmt_network(yamldoc["spec"]["master_management_network"].get("network"), datacenter_id)  
-                        temp6 = get_nsx_switch(cluster_id)
-                        temp7 = get_nsx_edge_cluster(cluster_id, temp6)
+                        if not temp5:
+                            print("wcpCluster/" + cluster + " check value for master_management_network - network")
+                            sys.exit()
+
+                        #Process for NSX config
+                        if yamldoc["spec"]["network_provider"] == "NSXT_CONTAINER_PLUGIN":
+                            temp6 = get_nsx_switch(cluster_id)
+                            if not temp6:
+                                print("wcpCluster/" + cluster + " no compatiable NSX switch for cluster")
+                                sys.exit()
+                            temp7 = get_nsx_edge_cluster(cluster_id, temp6)
+                            if not temp7:
+                                print("wcpCluster/" + cluster + " no compatiable NSX edge cluster")
+                                sys.exit()
+                            yamldoc["spec"]["ncp_cluster_network_spec"].update({"cluster_distributed_switch": temp6})
+                            yamldoc["spec"]["ncp_cluster_network_spec"].update({"nsx_edge_cluster": temp7})
+
+                        # Process BYO LB
+                        else:
+                            temp6 = get_mgmt_network(yamldoc["spec"]["workload_networks_spec"]["supervisor_primary_workload_network"]["vsphere_network"].get("portgroup"), datacenter_id)
+                            if not temp6:
+                                print("wcpCluster/" + cluster + " check value for master_management_network - network")
+                                sys.exit()
+                            yamldoc["spec"]["workload_networks_spec"]["supervisor_primary_workload_network"]["vsphere_network"].update({"portgroup": temp6})
 
                         # Update any of the above is 0 then quit
 
@@ -472,8 +494,6 @@ with open(filename, ) as f:
                         yamldoc["spec"]["image_storage"].update({"storage_policy": temp3})
                         yamldoc["spec"].update({"default_kubernetes_service_content_library": temp4})
                         yamldoc["spec"]["master_management_network"].update({"network": temp5})
-                        yamldoc["spec"]["ncp_cluster_network_spec"].update({"nsx_edge_cluster": temp6})
-                        yamldoc["spec"]["ncp_cluster_network_spec"].update({"cluster_distributed_switch": temp7})
 
                         json_payload = json.loads(json.dumps(yamldoc["spec"]))
                         json_response = s.post('https://'+vcip+'/api/vcenter/namespace-management/clusters/'+cluster_id+'?action=enable', headers=headers,json=json_payload)
