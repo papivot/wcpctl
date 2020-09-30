@@ -44,12 +44,12 @@ filename = cmd.filename
 if cmd.userid:
     userid = cmd.userid
 else:
-    if os.environ.get('WCP_USERNAME') == "":
+    if not os.environ.get('WCP_USERNAME'):
         userid = "administrator@vsphere.local"
     else:
         userid = os.environ.get('WCP_USERNAME')
 
-if os.environ.get('WCP_PASSWORD') == "":
+if not os.environ.get('WCP_PASSWORD'):
     password = getpass.getpass(prompt='Password: ')
 else:
     password = os.environ.get('WCP_PASSWORD')
@@ -132,8 +132,8 @@ def get_mgmt_network(mgmt_nw_name, dc):
     return 0
 
 
-def check_wcp_cluster_compatibility(cluster):
-    json_response = s.get('https://' + vcip + '/api/vcenter/namespace-management/cluster-compatibility')
+def check_wcp_cluster_compatibility(cluster,net_p):
+    json_response = s.get('https://' + vcip + '/api/vcenter/namespace-management/cluster-compatibility?network_provider='+ net_p)
     if json_response.ok:
         results = json.loads(json_response.text)
         res = next((sub for sub in results if sub['cluster'] == cluster), None)
@@ -260,25 +260,35 @@ with open(filename, ) as f:
                         if not temp5:
                             print("wcpCluster/" + cluster + " check value for master_management_network - network")
                             sys.exit()
-                        temp6 = get_nsx_switch(cluster_id)
-                        if not temp6:
-                            print("wcpCluster/" + cluster + " no compatiable NSX switch for cluster")
-                            sys.exit()
-                        temp7 = get_nsx_edge_cluster(cluster_id, temp6)
-                        if not temp7:
-                            print("wcpCluster/" + cluster + " no compatiable NSX edge cluster")
-                            sys.exit()
 
-                        # Update any of the above is 0 then quit
+                        #Process for NSX config
+                        if yamldoc["spec"]["network_provider"] == "NSXT_CONTAINER_PLUGIN":
+                            temp6 = get_nsx_switch(cluster_id)
+                            if not temp6:
+                                print("wcpCluster/" + cluster + " no compatiable NSX switch for cluster")
+                                sys.exit()
+                            temp7 = get_nsx_edge_cluster(cluster_id, temp6)
+                            if not temp7:
+                                print("wcpCluster/" + cluster + " no compatiable NSX edge cluster")
+                                sys.exit()
+                            yamldoc["spec"]["ncp_cluster_network_spec"].update({"cluster_distributed_switch": temp6})
+                            yamldoc["spec"]["ncp_cluster_network_spec"].update({"nsx_edge_cluster": temp7})
 
+                        # Process BYO LB
+                        else:
+                            temp6 = get_mgmt_network(yamldoc["spec"]["workload_networks_spec"]["supervisor_primary_workload_network"]["vsphere_network"].get("portgroup"), datacenter_id)
+                            if not temp6:
+                                print("wcpCluster/" + cluster + " check value for master_management_network - network")
+                                sys.exit()
+                            yamldoc["spec"]["workload_networks_spec"]["supervisor_primary_workload_network"]["vsphere_network"].update({"portgroup": temp6})
+
+                        # Update... any of the above is 0 then quit
                         yamldoc["spec"].update({"ephemeral_storage_policy": temp1})
                         yamldoc["spec"].update({"master_storage_policy": temp2})
                         yamldoc["spec"]["image_storage"].update({"storage_policy": temp3})
                         yamldoc["spec"].update({"default_kubernetes_service_content_library": temp4})
                         yamldoc["spec"]["master_management_network"].update({"network": temp5})
-                        yamldoc["spec"]["ncp_cluster_network_spec"].update({"cluster_distributed_switch": temp6})
-                        yamldoc["spec"]["ncp_cluster_network_spec"].update({"nsx_edge_cluster": temp7})
-
+ 
                         json_payload = json.loads(json.dumps(yamldoc["spec"]))
                         json_response = s.post('https://'+vcip+'/api/vcenter/namespace-management/clusters/'+cluster_id+'?action=enable', headers=headers,json=json_payload)
                         if json_response.ok:
