@@ -1,6 +1,7 @@
 argparse
 requests
+pysocks
 PyYAML
 jsonpatch==1.16
 jsonpointer==1.10
-jsonschema==2.6.0
+jsonschema>=3.0.1

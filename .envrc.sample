@@ -1,0 +1,2 @@
+export WCP_USERNAME=administrator@vsphere.local
+export WCP_PASSWORD=Change.Me.2020
