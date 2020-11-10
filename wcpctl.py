@@ -54,6 +54,10 @@ if not os.environ.get('WCP_PASSWORD'):
 else:
     password = os.environ.get('WCP_PASSWORD')
 
+if not os.environ.get('SKIP_COMPAT_CHECK'):
+    skip_compat = False
+else:
+    skip_compat = True
 
 def generate_random_uuid():
     return str(uuid.uuid4())
@@ -132,17 +136,20 @@ def get_mgmt_network(mgmt_nw_name, dc):
     return 0
 
 
-def check_wcp_cluster_compatibility(cluster,net_p):
-    json_response = s.get('https://' + vcip + '/api/vcenter/namespace-management/cluster-compatibility?network_provider='+ net_p)
-    if json_response.ok:
-        results = json.loads(json_response.text)
-        res = next((sub for sub in results if sub['cluster'] == cluster), None)
-        if res['compatible'] == True:
-            return 1
+def check_wcp_cluster_compatibility(cluster,net_p,skip_compat):
+    if skip_compat:
+        return 1
+    else:
+        json_response = s.get('https://' + vcip + '/api/vcenter/namespace-management/cluster-compatibility?network_provider='+ net_p)
+        if json_response.ok:
+            results = json.loads(json_response.text)
+            res = next((sub for sub in results if sub['cluster'] == cluster), None)
+            if res['compatible'] == True:
+                return 1
+            else:
+                return 0
         else:
             return 0
-    else:
-        return 0
 
 
 def check_wcp_cluster_status(cluster):
@@ -237,7 +244,7 @@ with open(filename, ) as f:
             if objtype == "wcpCluster":
                 del yamldoc["kind"]
                 del yamldoc["metadata"]
-                if check_wcp_cluster_compatibility(cluster_id, yamldoc["spec"]["network_provider"]):
+                if check_wcp_cluster_compatibility(cluster_id, yamldoc["spec"]["network_provider"],skip_compat):
                     if not check_wcp_cluster_status(cluster_id):
 
                         temp1 = get_storage_policy(yamldoc["spec"].get("ephemeral_storage_policy"))
@@ -454,7 +461,7 @@ with open(filename, ) as f:
             if objtype == "wcpCluster":
                 del yamldoc["kind"]
                 del yamldoc["metadata"]
-                if check_wcp_cluster_compatibility(cluster_id, yamldoc["spec"]["network_provider"]):
+                if check_wcp_cluster_compatibility(cluster_id, yamldoc["spec"]["network_provider"],skip_compat):
                     if not check_wcp_cluster_status(cluster_id):
 
                         temp1 = get_storage_policy(yamldoc["spec"].get("ephemeral_storage_policy"))
