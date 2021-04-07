@@ -1,7 +1,7 @@
 ---
 kind: wcpCluster
 metadata:
-  vcenter: pacific-vcsa1.env1.lab.local
+  vcenter: 192.168.100.50
   datacenter: Pacific-Datacenter
   cluster: Supervisor-Cluster
 spec:
@@ -15,11 +15,11 @@ spec:
   master_DNS_search_domains:
   - env1.lab.local
   master_NTP_servers:
-  - 10.128.243.13
+  - 192.168.100.2
   Master_DNS_names:
   - wcp-avi.env1.lab.local                                        # Change this
   workload_ntp_servers:
-  - 10.128.243.13
+  - 192.168.100.2
   master_management_network:
     address_range:
       subnet_mask: 255.255.254.0
@@ -28,10 +28,10 @@ spec:
       address_count: 5
     mode: STATICRANGE
     network: "DVPG-Management-network"
-  ephemeral_storage_policy: "vSAN Default Storage Policy"
-  master_storage_policy: "vSAN Default Storage Policy"
+  ephemeral_storage_policy: "pacific-gold-storage-policy"
+  master_storage_policy: "pacific-gold-storage-policy"
   image_storage:
-    storage_policy: "vSAN Default Storage Policy"
+    storage_policy: "pacific-gold-storage-policy"
   network_provider: VSPHERE_NETWORK
   size_hint: TINY
   login_banner:
@@ -45,13 +45,7 @@ spec:
         BQAwGTEXMBUGA1UEAwwOMTkyLjE2OC4xMDAuNTgwHhcNMjEwNDA2MjMzNDE1WhcN
         MjIwNDA2MjMzNDE1WjAZMRcwFQYDVQQDDA4xOTIuMTY4LjEwMC41ODCCASIwDQYJ
         KoZIhvcNAQEBBQADggEPADCCAQoCggEBANnO8darfpw6zAlHLenweQHnzYksFstq
-        89ZZH+9mtokfsIPK2nM+LgsdyTbdAJh5AiBlvhPwWzrP4wIWROSy6o5kwchuqmag
-        zohNQ20aD7yCqZV9aTJMKxA7r2eRKucgKjYfbLiVxp7qgESwoYvxm6TpGEcOZ/0w
-        sIbLBcHsp/fc8ivRIDR1GyGYlVr2wY4e33GC84epMfh6CcP/kl8D98dxhGGFyH24
-        c3E7DUzG4adocLOKKlkf/nqDoeLkQ6qQMRP2oaAgjhx+A72jcn0dmsEobK5ntB4P
-        Bjdyj9ODffjbFljmC7WzTSW2Cn0owYjMIdfJtM8bKoc0sHLmX12Y71cCAwEAAaMT
-        MBEwDwYDVR0RBAgwBocEwKhkOjANBgkqhkiG9w0BAQsFAAOCAQEAFKph6w78R5TK
-        2/BVceTfiAkxhzu0f0TGxPbx+a74+Ld+WHANOsc58Joz1/cb38aTtzdSQR7XEoC3
+        ...
         oL/WO9x4+foXiiPPcDhQ6Yeeu+yBzY6q1akwlznIYa2tfgC7WKMcM1QiAf2PKmcz
         Wq8/r6RaBnNBBfxP+yD4KEzFV0w2DBsUpiU2oj0mG2QT+CwpXQ53KaaOL7uRhZCu
         on5KeN8DDSz13QzF+LuyE5Ocs+odNtdpF5j0UwPzbVqU3s1AHxBVeKz/PIEhNWUK
@@ -62,7 +56,7 @@ spec:
       - port: 443
         host: 192.168.100.58
       username: admin
-      password: VMware1!
+      password: password
     provider: AVI
     id: avi
   workload_networks_spec:
