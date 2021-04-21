@@ -1,6 +1,7 @@
 # WCPCTL
-## A `kubectl` style command line tool to interact with vSphere 7 with Kubernetes Supervisor Cluster.
-## Now with support for vSphere 7.0 U1. Ability to spin up a non NSX-T based Supervisor Cluster.
+## A `kubectl` style command line tool to interact with vSphere 7 with Tanzu Supervisor Cluster.
+## Now with support for vSphere 7.0 U1. 
+### This can be used to spin up NSX-T or vSphere NW based Supervisor Cluster.
 
 ---
 
