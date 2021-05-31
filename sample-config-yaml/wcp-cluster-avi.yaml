@@ -9,64 +9,74 @@ spec:
     address: 10.96.0.0
     prefix: 24
   worker_DNS:
-  - 192.168.100.1
+  - 192.168.100.1                                             # Change this
   master_DNS:
-  - 192.168.100.1
+  - 192.168.100.1                                             # Change this
   master_DNS_search_domains:
-  - env1.lab.local
+  - env1.lab.local                                            # Change this
   master_NTP_servers:
-  - 192.168.100.2
+  - 192.168.100.2                                             # Change this
   Master_DNS_names:
-  - wcp-avi.env1.lab.local                                        # Change this
-  workload_ntp_servers:
+  - wcp-avi.env1.lab.local                                    # Change this
+  workload_ntp_servers:                                       # New addition  
   - 192.168.100.2
   master_management_network:
     address_range:
-      subnet_mask: 255.255.254.0
-      starting_address: 192.168.100.60
-      gateway: 192.168.100.1
+      starting_address: 192.168.100.60                        # Change this
+      subnet_mask: 255.255.254.0                              # Change this
+      gateway: 192.168.100.1                                  # Change this
       address_count: 5
     mode: STATICRANGE
-    network: "DVPG-Management-network"
-  ephemeral_storage_policy: "pacific-gold-storage-policy"
-  master_storage_policy: "pacific-gold-storage-policy"
+    network: DVPG-Management-network                        # Change this
+  ephemeral_storage_policy: tanzu       # Change this
   image_storage:
-    storage_policy: "pacific-gold-storage-policy"
+    storage_policy: tanzu         # Change this
+  master_storage_policy: tanzu          # Change this
   network_provider: VSPHERE_NETWORK
   size_hint: TINY
   login_banner:
-  default_kubernetes_service_content_library: Kubernetes 
+  default_kubernetes_service_content_library: Kubernetes      # Change this
+  # Networking details follow - 
   load_balancer_config_spec:
     address_ranges: []
     avi_config_create_spec:
-      certificate_authority_chain: |-
+      certificate_authority_chain: |
         -----BEGIN CERTIFICATE-----
-        MIIC0zCCAbugAwIBAgIUBOgkkS2DLTZF1CMw1bOXf2nxkoEwDQYJKoZIhvcNAQEL
-        BQAwGTEXMBUGA1UEAwwOMTkyLjE2OC4xMDAuNTgwHhcNMjEwNDA2MjMzNDE1WhcN
-        MjIwNDA2MjMzNDE1WjAZMRcwFQYDVQQDDA4xOTIuMTY4LjEwMC41ODCCASIwDQYJ
-        KoZIhvcNAQEBBQADggEPADCCAQoCggEBANnO8darfpw6zAlHLenweQHnzYksFstq
-        ...
-        oL/WO9x4+foXiiPPcDhQ6Yeeu+yBzY6q1akwlznIYa2tfgC7WKMcM1QiAf2PKmcz
-        Wq8/r6RaBnNBBfxP+yD4KEzFV0w2DBsUpiU2oj0mG2QT+CwpXQ53KaaOL7uRhZCu
-        on5KeN8DDSz13QzF+LuyE5Ocs+odNtdpF5j0UwPzbVqU3s1AHxBVeKz/PIEhNWUK
-        1hrTvMInV8bA3bRpwfvWW5MCh4njso0pBJ/o22tdJ3KFkWfwxSGNsTFgArs/sroM
-        kQgVqxxSbg==
+        MIIF7TCCA9WgAwIBAgIUDfbkpeT/F3JxoSWUG6n6LF98rDgwDQYJKoZIhvcNAQEN
+        BQAwaTELMAkGA1UEBhMCVVMxCzAJBgNVBAgMAlZBMRAwDgYDVQQHDAdBc2hidXJu
+        MQswCQYDVQQKDAJTRTERMA8GA1UECwwIUGVyc29uYWwxGzAZBgNVBAMMEmF2aS5l
+        bnYxLmxhYi5sb2NhbDAeFw0yMTA1MzAyMTU0MDRaFw0zMTA1MjgyMTU0MDRaMGkx
+        CzAJBgNVBAYTAlVTMQswCQYDVQQIDAJWQTEQMA4GA1UEBwwHQXNoYnVybjELMAkG
+        A1UECgwCU0UxETAPBgNVBAsMCFBlcnNvbmFsMRswGQYDVQQDDBJhdmkuZW52MS5s
+        YWIubG9jYWwwggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQDGgszSUZGo
+        ckKLcZ/d8XsKGtWT1L+0KjuOyZN7OK5vOnnXqA9j04QxfOPYeNtW8aCVbNWdelHG
+        1N8jVgZVEWIhIxvmfYlyoZdISWpBPElziL4s6OwoshICEeAY5CbJfQwHvZh2YDJP
+        ....
+        nktfWlPxPDIVNttNoMH4/EH8Hw4g28aJLu1JXpjf9ALqM8BjIj0w0ZG+WqycbbdZ
+        CpKx6/CjuWN3k9zxH+Td9k//7W0J9M1jgXQo3NLQk/vPqTyv+/RetwXUygQGmh5p
+        1L1kVaqrGafwypDhlR3aTDDtnksxxZhXzjqLkrbYBwSJw65QbXSmx1uCE+7bfIl4
+        BblspbE5b+MXb4JHZE/YC2/xSz/JTZ8CVrUHSdIqid36Wt3DqrXMFOTvfFBLiHAl
+        8e1qpielbfceTo/mYiVVkwjd/7wzW/vgGWinST6XMqgUHXfsTE0ZGVlsq2qe9WBZ
+        iEwPZ/hFN9YyExsa5wT7PDacj6vj1PULEX83R2NpkkUApn+0HcQkWLCBzdQDDIy/
+        7oAmF4rYjuLxyyZfLWhP6++4E9y+e8LKoCEX7eufBvymL/6IsJmG0A1ssBrCLMxs
+        AzLIWkmRs3mth54cQGwB1gCxe/C6Ci7KpT8IqaysnJkmn7XTgLKJaTiXghlfdTtP
+        MfSlv7u1laao2pgQOl6Mjf93qMEulrrBsz65mJO+CRRS
         -----END CERTIFICATE-----
       server:
-      - port: 443
-        host: 192.168.100.58
+        host: 192.168.100.58                                  # Change this
+        port: 443        
       username: admin
-      password: password
-    provider: AVI
+      password: VMware123
     id: avi
+    provider: AVI
   workload_networks_spec:
     supervisor_primary_workload_network:
-      network_provider: VSPHERE_NETWORK
       network: network-1
+      network_provider: VSPHERE_NETWORK
       vsphere_network:
         address_ranges:
-        - address: 192.168.102.10
-          count: 90
-        subnet_mask: 255.255.254.0
-        gateway: 192.168.102.1
-        portgroup: workload0-network
+        - address: 192.168.102.10                             # Change this
+          count: 90                                           # Change this
+        gateway: 192.168.102.1                                # Change this
+        subnet_mask: 255.255.254.0                            # Change this
+        portgroup: Workload0-VDS-PG

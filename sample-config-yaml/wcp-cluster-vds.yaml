@@ -18,20 +18,22 @@ spec:
   - 10.192.2.5                                                # Change this
   Master_DNS_names:
   - wcp.env4.lab.local                                        # Change this
+  workload_ntp_servers:                                       # New addition 
+  - 10.192.2.5 
   master_management_network:
     address_range:
-      gateway: 192.168.4.1                                    # Change this
       starting_address: 192.168.4.70                          # Change this
       subnet_mask: 255.255.255.0                              # Change this
+      gateway: 192.168.4.1                                    # Change this
       address_count: 5                     
     mode: STATICRANGE
     network: "DVPG-Management Network"                        # Change this
-  ephemeral_storage_policy: pacific-gold-storage-policy       # Change this    
+  ephemeral_storage_policy: pacific-gold-storage-policy       # Change this
   image_storage:
     storage_policy: pacific-gold-storage-policy               # Change this
   master_storage_policy: pacific-gold-storage-policy          # Change this
-  network_provider: VSPHERE_NETWORK                           
-  size_hint: TINY                                             
+  network_provider: VSPHERE_NETWORK
+  size_hint: TINY
   login_banner:
   default_kubernetes_service_content_library: Kubernetes      # Change this
   # Networking details follow - 
@@ -69,5 +71,5 @@ spec:
         - address: 192.168.140.10                             # Change this
           count: 90                                           # Change this
         gateway: 192.168.140.1                                # Change this
-        portgroup: Workload0          
         subnet_mask: 255.255.254.0                            # Change this
+        portgroup: Workload0
