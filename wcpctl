@@ -16,14 +16,8 @@
 
 from src.command.commands import Command
 import requests
-import json
-import time
 import yaml
-import sys
-import uuid
 import argparse
-import getpass
-import os
 import logging
 from src.utility.utilities import Utilities
 
