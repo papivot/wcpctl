@@ -20,7 +20,7 @@ import sys
 import time
 from src.utility.utilities import Utilities
 
-class wcpRegistry: # class name is looked up dynamically
+class wcpNamespace: # class name is looked up dynamically
   def __init__(self, args, yamldoc, token_header, cluster_id, skip_compat, datacenter_id):
     # get params
     self.args = args
