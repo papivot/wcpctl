@@ -18,27 +18,10 @@ import json
 import logging
 import sys
 from src.utility.utilities import Utilities
+from src.command.command_base import CommandBase
 
-class wcpCluster: # class name is looked up dynamically
-  def __init__(self, args, yamldoc, token_header, cluster_id, skip_compat, datacenter_id):
-    # get params
-    self.args = args
-    self.yamldoc = yamldoc
-    self.token_header = token_header
-    self.cluster_id = cluster_id
-    self.skip_compat = skip_compat
-    self.datacenter_id = datacenter_id
-
-    # get derived objects
-    self.objtype = self.yamldoc["kind"]
-    self.vcip = self.yamldoc["metadata"]["vcenter"]
-    self.datacenter = self.yamldoc["metadata"]["datacenter"]
-    self.cluster = self.yamldoc["metadata"]["cluster"]
-    self.spec = self.yamldoc["spec"]
-    self.session = "Global"
-    self.session = requests.Session()
-    self.session.verify = False
-
+class wcpCluster(CommandBase): # class name is looked up dynamically
+  
   def create(self):
     # create wcpCluster
     if self.objtype == "wcpCluster":
