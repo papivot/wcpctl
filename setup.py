@@ -23,5 +23,5 @@ setuptools.setup(
         'Programming Language :: Python :: 3.9'
     ],
     python_requires=">=3.6",
-    scripts=["src/wcpctl.py"]
+    scripts=["src/wcpctl"]
 )
