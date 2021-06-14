@@ -16,7 +16,7 @@ import requests
 
 class CommandBase:
 
-  def __init__(self, args, yamldoc, token_header, cluster_id, skip_compat, datacenter_id, session):
+  def __init__(self, args, yamldoc, token_header, cluster_id, skip_compat, datacenter_id, session: requests.session):
     # get params
     self.args = args
     self.yamldoc = yamldoc

@@ -63,11 +63,15 @@ if __name__ == "__main__":
   cmd = parser.parse_args()
 
   # for every yaml, run the command
-  with open(cmd.filename, ) as f:
-    yamldocs = yaml.load_all(f, Loader=yaml.FullLoader)
-    for yamldoc in yamldocs:
-      command = Command(cmd, yamldoc)
-      verb = getattr(command, cmd.verb)
-      verb()
-
+  try:
+    with open(cmd.filename, ) as f:
+      yamldocs = yaml.load_all(f, Loader=yaml.FullLoader)
+      for yamldoc in yamldocs:
+        command = Command(cmd, yamldoc)
+        verb = getattr(command, cmd.verb)
+        verb()
+  except ImportError as e:
+    # do nothing, there's an ongoing error in requests that is triggering an exception here, this only happens during shutdown
+    pass
+  
 

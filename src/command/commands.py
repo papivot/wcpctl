@@ -62,7 +62,7 @@ class Command:
       self.skip_compat = True
 
     # skip the following if this is a test command
-    if self.objtype.find("test") != 0-1:
+    if self.objtype.find("test") != -1:
       self.token_header = {'vmware-api-session-id': 'test'}
       self.datacenter_id = "test"
       self.cluster_id = "test"
@@ -91,10 +91,6 @@ class Command:
       sys.exit()
     self.cluster_id = json.loads(cluster_object.text)["value"][0].get("cluster")
 
-  def __del__(self):
-    # Clean up and exit...
-    session_delete = self.session.delete('https://' + self.vcip + '/rest/com/vmware/cis/session', auth=(self.userid, self.password))
-
   def create(self):
     # create instance of the class and call creation method
     module = importlib.import_module("src.command")
@@ -106,6 +102,10 @@ class Command:
     except:
       e = sys.exc_info()[0]
       logging.error("There was an error when creating object type: {0} : {1}".format(self.objtype, sys.exc_info()[1]))
+      
+    # end the open session
+    if self.objtype.find("test") != 0:
+      session_delete = self.session.delete('https://' + self.vcip + '/rest/com/vmware/cis/session', auth=(self.userid, self.password))
 
   def delete(self):
     # create instance of the class and call creation method
@@ -119,6 +119,10 @@ class Command:
       e = sys.exc_info()[0]
       logging.error("There was an error when deleting object type: {0} : {1}".format(self.objtype, e))
 
+    # end the open session
+    if self.objtype.find("test") != 0:
+      session_delete = self.session.delete('https://' + self.vcip + '/rest/com/vmware/cis/session', auth=(self.userid, self.password))
+
   def apply(self):
     # create instance of the class and call creation method
     module = importlib.import_module("src.command")
@@ -131,6 +135,10 @@ class Command:
       e = sys.exc_info()[0]
       logging.error("There was an error when applying object type: {0} : {1}".format(self.objtype, e))
   
+    # end the open session
+    if self.objtype.find("test") != 0:
+      session_delete = self.session.delete('https://' + self.vcip + '/rest/com/vmware/cis/session', auth=(self.userid, self.password))
+
   def describe(self):
     # create instance of the class and call creation method
     module = importlib.import_module("src.command")
@@ -143,3 +151,6 @@ class Command:
       e = sys.exc_info()[0]
       logging.error("There was an error when describing object type: {0} : {1}".format(self.objtype, e))
   
+    # end the open session
+    if self.objtype.find("test") != 0:
+      session_delete = self.session.delete('https://' + self.vcip + '/rest/com/vmware/cis/session', auth=(self.userid, self.password))
