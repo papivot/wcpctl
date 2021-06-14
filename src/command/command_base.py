@@ -16,6 +16,7 @@ import requests
 
 class CommandBase:
 
+  # constructor to handle the common values
   def __init__(self, args, yamldoc, token_header, cluster_id, skip_compat, datacenter_id, session: requests.session):
     # get params
     self.args = args
