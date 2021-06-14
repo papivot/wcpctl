@@ -41,9 +41,8 @@ Some guidance inspired from the awesome work of *vthinkbeyondvm.com*
 * Make sure you have admin access to the vCenter server.
 * Make sure the workstation where the `wcpctl` cli will run on has access to the VCenter server. 
 * Clone this repo. 
-* Execute `chmod +x wcpctl` if its not already set to execute. 
+* Install the package using pip: `pip3 install .` in the base directory
 * Modify the YAML config files provided in the `sample-config-yaml` folder. 
-* If possible, move the `wcpctl` file a folder in $PATH. E.g. `sudo cp wcpctl /usr/local/bin`
 * Execute the `wcpctl` code.
 
 ```
@@ -121,4 +120,3 @@ To add a new object type/kind, simply implement the CommandBase class and its 4 
 
 # TODO
 * Update Utilities class methods to share sessions from the command objects.
-* Rename/Repackage Command in to something more universal (like wcpCommand)
