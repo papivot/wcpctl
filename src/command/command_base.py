@@ -33,3 +33,15 @@ class CommandBase:
     self.datacenter = self.yamldoc["metadata"]["datacenter"]
     self.cluster = self.yamldoc["metadata"]["cluster"]
     self.spec = self.yamldoc["spec"]
+
+  def create(self):
+    raise ImplementationError("This method is not currently implemented!")
+  def delete(self):
+    raise ImplementationError("This method is not currently implemented!")
+  def apply(self):
+    raise ImplementationError("This method is not currently implemented!")
+  def describe(self):
+    raise ImplementationError("This method is not currently implemented!")
+
+class ImplementationError(ValueError):
+    pass

@@ -41,16 +41,16 @@ Some guidance inspired from the awesome work of *vthinkbeyondvm.com*
 * Make sure you have admin access to the vCenter server.
 * Make sure the workstation where the `wcpctl` cli will run on has access to the VCenter server. 
 * Clone this repo. 
-* Execute `chmod +x wcpctl.py` if its not already set to execute. 
+* Execute `chmod +x wcpctl` if its not already set to execute. 
 * Modify the YAML config files provided in the `sample-config-yaml` folder. 
-* If possible, move the `wcpctl.py` file a folder in $PATH. E.g. `sudo cp wcpctl.py /usr/local/bin`
+* If possible, move the `wcpctl` file a folder in $PATH. E.g. `sudo cp wcpctl /usr/local/bin`
 * Execute the `wcpctl` code.
 
 ```
-$ wcpctl.py -h  
+$ wcpctl -h  
 =============================================================================
 
-usage: wcpctl.py [-h] [--version] {create,apply,delete,describe} ...
+usage: wcpctl [-h] [--version] {create,apply,delete,describe} ...
 
 wcpctl controls for managing Supervisor Clusters in vSphere 7 with K8s. Uses
 YAML configuration files to setup and manage the Supervisor Cluster. Find
@@ -77,36 +77,48 @@ optional arguments:
   - NSX configuration
 
 ```
-wcpctl.py create some-wcp-cluster-config.yaml -u administrator@vsphere.local
+wcpctl create some-wcp-cluster-config.yaml -u administrator@vsphere.local
 ```
 
 #### To disable the Supervisor Cluster, 
 ```
-wcpctl.py delete some-wcp-cluster-config.yaml
+wcpctl delete some-wcp-cluster-config.yaml
 ```
 
 
 #### To modify Namespace(s) 
 ```
-wcpctl.py apply some-namespaceconfig.yaml
+wcpctl apply some-namespaceconfig.yaml
 ```
 
 #### To create a Registry 
 ```
-wcpctl.py create some-regconfig.yaml
+wcpctl create some-regconfig.yaml
 ```
 
 #### To describe Registry 
 ```
-wcpctl.py describe some-nsconfigfile.yaml
+wcpctl describe some-nsconfigfile.yaml
 ```
 
 #### To create a WCP content library
 ```
-wcpctl.py create some-contentlibconfigfile.yaml
+wcpctl create some-contentlibconfigfile.yaml
 ```
 
 
 ### Feedback
 
 Would love feedback from users. 
+
+# How to add features
+
+There has been significant change to the wcpctl file and the repo structure in general. First off, there is no singular file containing all code any longer. Command-line-specific code has been kept within wcpctl (and renamed) and specific implementation code has been moved into the src/command directory.
+
+Each object type/kind supported (at this writing, wcpCluster, wcpContentLibrary, wcpNamespace, and wcpRegistry) have been extracted into classes that inherit from a common base. Each of these implement a create/delete/apply/describe method that is dynmically called by the Commands class. This dynamic pattern reduces if/else toil when handling command-line parameters. The top-level create/delete/apply/describe methods are defined in the commands module. Each will reach out to attempt to call the applicable method within the type/kind specified in the input yaml file(s).
+
+To add a new object type/kind, simply implement the CommandBase class and its 4 methods (see existing modules in src/commands for examples).
+
+# TODO
+* Update Utilities class methods to share sessions from the command objects.
+* Rename/Repackage Command in to something more universal (like wcpCommand)
