@@ -17,8 +17,8 @@ import requests
 import json
 import logging
 import sys
-from src.utility.utilities import Utilities
-from src.command.command_base import CommandBase
+from wcp_utility import *
+from command.command_base import CommandBase
 
 class wcpCluster(CommandBase): # class name is looked up dynamically
   

@@ -23,8 +23,7 @@ import getpass
 import time
 import types
 import inspect
-from src.utility.utilities import Utilities
-import src.command
+import command
 
 class Command:
 
@@ -93,7 +92,7 @@ class Command:
 
   def create(self):
     # create instance of the class and call creation method
-    module = importlib.import_module("src.command")
+    module = importlib.import_module("command")
     obj_type = getattr(module, self.objtype)
         
     try:
@@ -109,7 +108,7 @@ class Command:
 
   def delete(self):
     # create instance of the class and call creation method
-    module = importlib.import_module("src.command")
+    module = importlib.import_module("command")
     obj_type = getattr(module, self.objtype)
 
     try:
@@ -125,7 +124,7 @@ class Command:
 
   def apply(self):
     # create instance of the class and call creation method
-    module = importlib.import_module("src.command")
+    module = importlib.import_module("command")
     obj_type = getattr(module, self.objtype)
 
     try:
@@ -141,7 +140,7 @@ class Command:
 
   def describe(self):
     # create instance of the class and call creation method
-    module = importlib.import_module("src.command")
+    module = importlib.import_module("command")
     obj_type = getattr(module, self.objtype)
 
     try:

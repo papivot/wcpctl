@@ -13,12 +13,8 @@
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import requests
-import json
 import logging
-import sys
-from src.utility.utilities import Utilities
-from src.command.command_base import CommandBase
+from command.command_base import CommandBase
 
 class testCommand(CommandBase): # class name is looked up dynamically
   def create(self):

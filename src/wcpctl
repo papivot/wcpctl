@@ -14,12 +14,11 @@
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from src.command.commands import Command
+from command.commands import Command
 import requests
 import yaml
 import argparse
 import logging
-from src.utility.utilities import Utilities
 
 def build_parser():
   parser = argparse.ArgumentParser(description='wcpctl controls for managing Supervisor Clusters in vSphere 7 with K8s. Uses YAML configuration files to setup and manage the Supervisor Cluster. Find additional information at: https://github.io/papivot/wcpctl')

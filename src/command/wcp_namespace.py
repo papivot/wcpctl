@@ -13,13 +13,11 @@
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import requests
 import json
 import logging
 import sys
-import time
-from src.utility.utilities import Utilities
-from src.command.command_base import CommandBase
+from wcp_utility import *
+from command.command_base import CommandBase
 
 class wcpNamespace(CommandBase): # class name is looked up dynamically
 
