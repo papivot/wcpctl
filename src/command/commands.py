@@ -13,6 +13,7 @@
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+import importlib
 import requests
 import json
 import os
@@ -38,7 +39,6 @@ class Command:
     self.datacenter = self.yamldoc["metadata"]["datacenter"]
     self.cluster = self.yamldoc["metadata"]["cluster"]
     self.spec = self.yamldoc["spec"]
-    self.session = "Global"
     self.session = requests.Session()
     self.session.verify = False
 
@@ -61,6 +61,13 @@ class Command:
     else:
       self.skip_compat = True
 
+    # skip the following if this is a test command
+    if self.objtype.find("test") != 0-1:
+      self.token_header = {'vmware-api-session-id': 'test'}
+      self.datacenter_id = "test"
+      self.cluster_id = "test"
+      return
+
     # Connect to VCenter and start a session
     vcsession = self.session.post('https://' + self.vcip + '/rest/com/vmware/cis/session', auth=(self.userid, self.password))
     if not vcsession.ok:
@@ -82,57 +89,57 @@ class Command:
     if len(json.loads(cluster_object.text)["value"]) == 0:
       logging.error("No cluster found, please enter valid cluster name")
       sys.exit()
-    cluster_id = json.loads(cluster_object.text)["value"][0].get("cluster")
+    self.cluster_id = json.loads(cluster_object.text)["value"][0].get("cluster")
 
   def __del__(self):
     # Clean up and exit...
     session_delete = self.session.delete('https://' + self.vcip + '/rest/com/vmware/cis/session', auth=(self.userid, self.password))
 
   def create(self):
-    # dynamically check if type exists
-    if self.objtype in inspect.getmembers(types):
-      # create instance of the class and call creation method
-      obj_type = globals()[self.objtype]
-      try:
-        obj_instance = obj_type(self.args, self.yamldoc, self.token_header, self.cluster_id, self.skip_compat, self.datacenter_id)
-        obj_instance.create()
-      except:
-        e = sys.exc_info()[0]
-        logging.error("There was an error when creating object type: {0} : {1}".format(self.objtype, e))
+    # create instance of the class and call creation method
+    module = importlib.import_module("src.command")
+    obj_type = getattr(module, self.objtype)
+        
+    try:
+      obj_instance = obj_type(self.args, self.yamldoc, self.token_header, self.cluster_id, self.skip_compat, self.datacenter_id, self.session)
+      obj_instance.create()
+    except:
+      e = sys.exc_info()[0]
+      logging.error("There was an error when creating object type: {0} : {1}".format(self.objtype, sys.exc_info()[1]))
 
   def delete(self):
-    # dynamically check if type exists
-    if self.objtype in inspect.getmembers(types):
-      # create instance of the class and call creation method
-      obj_type = globals()[self.objtype]
-      try:
-        obj_instance = obj_type(self.args, self.yamldoc, self.token_header, self.cluster_id, self.skip_compat, self.datacenter_id)
-        obj_instance.delete()
-      except:
-        e = sys.exc_info()[0]
-        logging.error("There was an error when deleting object type: {0} : {1}".format(self.objtype, e))
+    # create instance of the class and call creation method
+    module = importlib.import_module("src.command")
+    obj_type = getattr(module, self.objtype)
+
+    try:
+      obj_instance = obj_type(self.args, self.yamldoc, self.token_header, self.cluster_id, self.skip_compat, self.datacenter_id, self.session)
+      obj_instance.delete()
+    except:
+      e = sys.exc_info()[0]
+      logging.error("There was an error when deleting object type: {0} : {1}".format(self.objtype, e))
 
   def apply(self):
-    # dynamically check if type exists
-    if self.objtype in inspect.getmembers(types):
-      # create instance of the class and call creation method
-      obj_type = globals()[self.objtype]
-      try:
-        obj_instance = obj_type(self.args, self.yamldoc, self.token_header, self.cluster_id, self.skip_compat, self.datacenter_id)
-        obj_instance.apply()
-      except:
-        e = sys.exc_info()[0]
-        logging.error("There was an error when applying object type: {0} : {1}".format(self.objtype, e))
+    # create instance of the class and call creation method
+    module = importlib.import_module("src.command")
+    obj_type = getattr(module, self.objtype)
+
+    try:
+      obj_instance = obj_type(self.args, self.yamldoc, self.token_header, self.cluster_id, self.skip_compat, self.datacenter_id, self.session)
+      obj_instance.apply()
+    except:
+      e = sys.exc_info()[0]
+      logging.error("There was an error when applying object type: {0} : {1}".format(self.objtype, e))
   
   def describe(self):
-    # dynamically check if type exists
-    if self.objtype in inspect.getmembers(types):
-      # create instance of the class and call creation method
-      obj_type = globals()[self.objtype]
-      try:
-        obj_instance = obj_type(self.args, self.yamldoc, self.token_header, self.cluster_id, self.skip_compat, self.datacenter_id)
-        obj_instance.describe()
-      except:
-        e = sys.exc_info()[0]
-        logging.error("There was an error when describing object type: {0} : {1}".format(self.objtype, e))
+    # create instance of the class and call creation method
+    module = importlib.import_module("src.command")
+    obj_type = getattr(module, self.objtype)
+
+    try:
+      obj_instance = obj_type(self.args, self.yamldoc, self.token_header, self.cluster_id, self.skip_compat, self.datacenter_id, self.session)
+      obj_instance.describe()
+    except:
+      e = sys.exc_info()[0]
+      logging.error("There was an error when describing object type: {0} : {1}".format(self.objtype, e))
   

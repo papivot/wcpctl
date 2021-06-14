@@ -55,7 +55,6 @@ if __name__ == "__main__":
   # configure requests
   from requests.packages.urllib3.exceptions import InsecureRequestWarning
   requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-  headers = {'content-type': 'application/json'}
 
   # configure parsing opts
   parser = build_parser()

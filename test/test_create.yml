@@ -1,0 +1,63 @@
+---
+kind: testCommand
+metadata:
+  vcenter: 192.168.4.50
+  datacenter: Pacific-Datacenter                        
+  cluster: Workload-Cluster                             
+spec:
+  service_cidr:
+    address: 10.96.0.0
+    prefix: 24
+  worker_DNS:
+  - 192.168.4.1                                               # Change this
+  master_DNS:
+  - 192.168.4.1                                               # Change this
+  master_DNS_search_domains:
+  - env4.lab.local                                            # Change this
+  master_NTP_servers:
+  - 10.192.2.5                                                # Change this
+  Master_DNS_names:
+  - wcp.env4.lab.local                                        # Change this
+  workload_ntp_servers:                                       # New addition 
+  - 10.192.2.5 
+  master_management_network:
+    address_range:
+      starting_address: 192.168.4.70                          # Change this
+      subnet_mask: 255.255.255.0                              # Change this
+      gateway: 192.168.4.1                                    # Change this
+      address_count: 5                     
+    mode: STATICRANGE
+    network: "DVPG-Management Network"                        # Change this
+  ephemeral_storage_policy: pacific-gold-storage-policy       # Change this
+  image_storage:
+    storage_policy: pacific-gold-storage-policy               # Change this
+  master_storage_policy: pacific-gold-storage-policy          # Change this
+  network_provider: VSPHERE_NETWORK
+  size_hint: TINY
+  login_banner:
+  default_kubernetes_service_content_library: Kubernetes      # Change this
+  # Networking details follow - 
+  load_balancer_config_spec:
+    address_ranges:
+    - address: 192.168.141.1                                  # Change this
+      count: 99                                               # Change this
+    ha_proxy_config_create_spec:
+      certificate_authority_chain: blah
+      servers:
+      - host: 192.168.4.57                                    # Change this
+        port: 5556
+      username: admin
+      password: VMware1VMware1
+    id: haproxy-1
+    provider: HA_PROXY
+  workload_networks_spec:
+    supervisor_primary_workload_network:
+      network: network-1
+      network_provider: VSPHERE_NETWORK
+      vsphere_network:
+        address_ranges:
+        - address: 192.168.140.10                             # Change this
+          count: 90                                           # Change this
+        gateway: 192.168.140.1                                # Change this
+        subnet_mask: 255.255.254.0                            # Change this
+        portgroup: Workload0
