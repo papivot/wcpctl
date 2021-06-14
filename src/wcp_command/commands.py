@@ -23,7 +23,7 @@ import getpass
 import time
 import types
 import inspect
-import command
+import wcp_command
 
 class Command:
 
@@ -92,7 +92,7 @@ class Command:
 
   def create(self):
     # create instance of the class and call creation method
-    module = importlib.import_module("command")
+    module = importlib.import_module("wcp_command")
     obj_type = getattr(module, self.objtype)
         
     try:
@@ -108,7 +108,7 @@ class Command:
 
   def delete(self):
     # create instance of the class and call creation method
-    module = importlib.import_module("command")
+    module = importlib.import_module("wcp_command")
     obj_type = getattr(module, self.objtype)
 
     try:
@@ -124,7 +124,7 @@ class Command:
 
   def apply(self):
     # create instance of the class and call creation method
-    module = importlib.import_module("command")
+    module = importlib.import_module("wcp_command")
     obj_type = getattr(module, self.objtype)
 
     try:
@@ -140,7 +140,7 @@ class Command:
 
   def describe(self):
     # create instance of the class and call creation method
-    module = importlib.import_module("command")
+    module = importlib.import_module("wcp_command")
     obj_type = getattr(module, self.objtype)
 
     try:

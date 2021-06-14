@@ -14,7 +14,7 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import logging
-from command.command_base import CommandBase
+from wcp_command.command_base import CommandBase
 
 class testCommand(CommandBase): # class name is looked up dynamically
   def create(self):

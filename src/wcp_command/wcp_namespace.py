@@ -17,7 +17,7 @@ import json
 import logging
 import sys
 from wcp_utility import *
-from command.command_base import CommandBase
+from wcp_command.command_base import CommandBase
 
 class wcpNamespace(CommandBase): # class name is looked up dynamically
 

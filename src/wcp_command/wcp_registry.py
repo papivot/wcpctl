@@ -18,7 +18,7 @@ import logging
 import sys
 import time
 from wcp_utility import *
-from command.command_base import CommandBase
+from wcp_command.command_base import CommandBase
 
 class wcpRegistry(CommandBase): # class name is looked up dynamically
 
