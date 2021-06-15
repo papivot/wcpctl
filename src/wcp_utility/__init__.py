@@ -35,7 +35,7 @@ class Utilities:
         if result["name"] == storage_name:
             return result["datastore"]
     else:
-      return 0
+      return -1
     return 0
 
   @staticmethod
@@ -49,10 +49,10 @@ class Utilities:
       for result in results:
         if result["name"] == sp_name:
           return result["policy"]
-      else:
-        return 0
+        else:
+          return 0
     else:
-      return 0
+      return -1
 
   def get_content_library(cl_name: str, vcip: str, token_header: str):
     s = requests.Session()
@@ -68,7 +68,7 @@ class Utilities:
           if cl_library["name"] == cl_name:
             return cl_library["id"]
     else:
-      return 0
+      return -1
     return 0
 
   @staticmethod
@@ -83,7 +83,7 @@ class Utilities:
       nsx_sw_id = results[0]['distributed_switch']
       return nsx_sw_id
     else:
-      return 0
+      return -1
 
   @staticmethod
   def get_nsx_edge_cluster(cluster: str, dvs: str, vcip: str, token_header: str):
@@ -96,7 +96,7 @@ class Utilities:
       edge_id = results[0]['edge_cluster']
       return edge_id
     else:
-      return 0
+      return -1
 
   @staticmethod
   def get_mgmt_network(mgmt_nw_name: str, dc: str, vcip: str, token_header: str):
@@ -110,7 +110,7 @@ class Utilities:
         if result["name"] == mgmt_nw_name:
             return result["network"]
     else:
-      return 0
+      return -1
     return 0
 
   @staticmethod
@@ -130,7 +130,7 @@ class Utilities:
         else:
           return 0
       else:
-        return 0
+        return -1
 
   @staticmethod
   def check_wcp_cluster_status(cluster: str, vcip: str, token_header: str):
@@ -146,7 +146,7 @@ class Utilities:
       else:
         return 0
     else:
-      return 0
+      return -1
 
   @staticmethod
   def check_wcp_harbor_status(cluster: str, vcip: str, token_header: str):
@@ -183,7 +183,7 @@ class Utilities:
       else:
         return 0
     else:
-      return 0
+      return -1
 
   @staticmethod
   def check_wcp_ns_status(ns_name: str, vcip: str, token_header: str):
@@ -198,4 +198,4 @@ class Utilities:
       else:
         return 0
     else:
-      return 0
+      return -1

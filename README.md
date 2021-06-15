@@ -120,3 +120,5 @@ To add a new object type/kind, simply implement the CommandBase class and its 4 
 
 # TODO
 * Update Utilities class methods to share sessions from the command objects.
+* Update sys.exit commands to throw an exception with exit information
+* Add command-line param for log-level

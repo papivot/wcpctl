@@ -66,6 +66,7 @@ class wcpRegistry(CommandBase): # class name is looked up dynamically
         logging.info("wcpRegistry/Harbor already running")
       else:
         logging.error("Received an invalid error code when checking Harbor status")
+        sys.exit(-1)
       
   
   def delete(self):
@@ -95,6 +96,7 @@ class wcpRegistry(CommandBase): # class name is looked up dynamically
         logging.warning("wcpRegistry/Harbor not found")
       else:
         logging.error("Error retrieving harbor information")
+        sys.exit(-1)
 
   def apply(self):
     # apply wcpRegistry
@@ -143,6 +145,7 @@ class wcpRegistry(CommandBase): # class name is looked up dynamically
           logging.warning("wcpRegistry/Harbor already running")
         else:
           logging.error("wcpRegistry/Harbor status check failed")
+          sys.exit(-1)
 
   def describe(self):
     # describe wcpRegistry
@@ -152,7 +155,7 @@ class wcpRegistry(CommandBase): # class name is looked up dynamically
       harbor_id = Utilities.check_wcp_harbor_status(self.cluster_id, self.vcip, self.token_header)
       if harbor_id > 0:
         logging.info("Found harbor registry")
-        json_response = self.session.get('https://' + self.vcip + '/rest/vcenter/content/registries/harbor/' + harbor_id)
+        json_response = self.session.get('https://' + self.vcip + '/rest/vcenter/content/registries/harbor/' + harbor_id, headers=self.token_header)
         if (json_response.ok):
           result = json.loads(json_response.text)
           logging.info(json.dumps(result, indent=2, sort_keys=True))
@@ -162,3 +165,4 @@ class wcpRegistry(CommandBase): # class name is looked up dynamically
         logging.warning("wcpRegistry/Harbor not found")
       else: 
         logging.error("wcpRegsitry/Harbor status failed")
+        sys.exit(-1)
