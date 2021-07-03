@@ -99,8 +99,7 @@ class Command:
       obj_instance = obj_type(self.args, self.yamldoc, self.token_header, self.cluster_id, self.skip_compat, self.datacenter_id, self.session)
       obj_instance.create()
     except:
-      e = sys.exc_info()[0]
-      logging.error("There was an error when creating object type: {0} : {1}".format(self.objtype, sys.exc_info()[1]))
+      logging.exception("There was an error when creating object")
       
     # end the open session
     if self.objtype.find("test") != 0:
@@ -115,8 +114,7 @@ class Command:
       obj_instance = obj_type(self.args, self.yamldoc, self.token_header, self.cluster_id, self.skip_compat, self.datacenter_id, self.session)
       obj_instance.delete()
     except:
-      e = sys.exc_info()[0]
-      logging.error("There was an error when deleting object type: {0} : {1}".format(self.objtype, e))
+      logging.exception("There was an error when deleting object")
 
     # end the open session
     if self.objtype.find("test") != 0:
@@ -131,8 +129,7 @@ class Command:
       obj_instance = obj_type(self.args, self.yamldoc, self.token_header, self.cluster_id, self.skip_compat, self.datacenter_id, self.session)
       obj_instance.apply()
     except:
-      e = sys.exc_info()[0]
-      logging.error("There was an error when applying object type: {0} : {1}".format(self.objtype, e))
+      logging.exception("There was an error when applying object")
   
     # end the open session
     if self.objtype.find("test") != 0:
@@ -147,8 +144,7 @@ class Command:
       obj_instance = obj_type(self.args, self.yamldoc, self.token_header, self.cluster_id, self.skip_compat, self.datacenter_id, self.session)
       obj_instance.describe()
     except:
-      e = sys.exc_info()[0]
-      logging.error("There was an error when describing object type: {0} : {1}".format(self.objtype, e))
+      logging.exception("There was an error when describing object")
   
     # end the open session
     if self.objtype.find("test") != 0:

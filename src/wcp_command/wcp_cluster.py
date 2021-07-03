@@ -29,143 +29,61 @@ class wcpCluster(CommandBase): # class name is looked up dynamically
       del self.yamldoc["kind"]
       del self.yamldoc["metadata"]
 
-      cluster = Utilities.check_wcp_cluster_compatibility(self.cluster_id, self.yamldoc["spec"]["network_provider"], self.skip_compat, self.vcip, self.token_header)
-      if cluster == 0:
+      # cluster = Utilities.check_wcp_cluster_compatibility(self.cluster_id, self.yamldoc["spec"]["network_provider"], self.skip_compat, self.vcip, self.token_header)
+      # if cluster == 0:
 
-        cluster_id = Utilities.check_wcp_cluster_status(self.cluster_id, self.token_header)
-        if cluster_id == 0:
-          temp1 = Utilities.get_storage_policy(self.yamldoc["spec"].get("ephemeral_storage_policy"), self.vcip)
-          if not temp1:
-            logging.error("wcpCluster/" + self.cluster + " check value for ephemeral_storage_policy")
-            sys.exit(-1)
-          temp2 = Utilities.get_storage_policy(self.yamldoc["spec"].get("master_storage_policy"), self.vcip)
-          if not temp2:
-            logging.error("wcpCluster/" + self.cluster + " check value for master_storage_policy")
-            sys.exit(-1)
-          temp3 = Utilities.get_storage_policy(self.yamldoc["spec"]["image_storage"].get("storage_policy"), self.vcip)
-          if not temp3:
-            logging.error("wcpCluster/" + self.cluster + " check value for storage_policy")
-            sys.exit(-1)
-          temp4 = Utilities.get_content_library(self.yamldoc["spec"].get("default_kubernetes_service_content_library"), self.vcip)
-          if not temp4:
-            logging.error ("wcpCluster/"+self.cluster+" check value for default_kubernetes_service_content_library")
-            sys.exit(-1)
-          temp5 = Utilities.get_mgmt_network(self.yamldoc["spec"]["master_management_network"].get("network"), self.datacenter_id, self.vcip)  
-          if not temp5:
-            logging.error("wcpCluster/" + self.cluster + " check value for master_management_network - network")
-            sys.exit(-1)
+      cluster_id, err = Utilities.check_wcp_cluster_status(self.cluster_id, self.vcip, self.token_header)
+      if err != 0:
+        logging.error("wcpCluster/"+self.cluster+" failed status check")
+        sys.exit(-1)
 
-          #Process for NSX config
-          if self.yamldoc["spec"]["network_provider"] == "NSXT_CONTAINER_PLUGIN":
-            temp6 = Utilities.get_nsx_switch(self.cluster_id, self.vcip)
-            if not temp6:
-              logging.error("wcpCluster/" + self.cluster + " no compatiable NSX switch for cluster")
-              sys.exit(-1)
-            temp7 = Utilities.get_nsx_edge_cluster(self.cluster_id, temp6, self.vcip)
-            if not temp7:
-              logging.error("wcpCluster/" + self.cluster + " no compatiable NSX edge cluster")
-              sys.exit(-1)
-            self.yamldoc["spec"]["ncp_cluster_network_spec"].update({"cluster_distributed_switch": temp6})
-            self.yamldoc["spec"]["ncp_cluster_network_spec"].update({"nsx_edge_cluster": temp7})
-
-          # Process BYO LB
-          else:
-            temp6 = Utilities.get_mgmt_network(self.yamldoc["spec"]["workload_networks_spec"]["supervisor_primary_workload_network"]["vsphere_network"].get("portgroup"), self.datacenter_id, self.vcip)
-            if not temp6:
-              logging.error("wcpCluster/" + self.cluster + " check value for master_management_network - network")
-              sys.exit(-1)
-            self.yamldoc["spec"]["workload_networks_spec"]["supervisor_primary_workload_network"]["vsphere_network"].update({"portgroup": temp6})
-
-            # Update ...if any of the above is 0 then quit
-            self.yamldoc["spec"].update({"ephemeral_storage_policy": temp1})
-            self.yamldoc["spec"].update({"master_storage_policy": temp2})
-            self.yamldoc["spec"]["image_storage"].update({"storage_policy": temp3})
-            self.yamldoc["spec"].update({"default_kubernetes_service_content_library": temp4})
-            self.yamldoc["spec"]["master_management_network"].update({"network": temp5})
-
-            json_payload = json.loads(json.dumps(self.yamldoc["spec"]))
-            json_response = self.session.post('https://'+self.vcip+'/api/vcenter/namespace-management/clusters/'+self.cluster_id+'?action=enable', headers=self.token_header,json=json_payload)
-            if json_response.ok:
-              logging.info("wcpCluster/" + self.cluster + " creation started")
-            else:
-              logging.error("wcpCluster/" + self.cluster + " creation failed")
-              logging.error(json_response.text)
-        elif cluster_id > 0:
-          logging.warning("wcpCluster/"+self.cluster+" already operational at https://"+Utilities.check_wcp_cluster_status(self.cluster_id, self.vcip, self.token_header))
-        else:
-          logging.error("wcpCluster/"+self.cluster+" failed status check")
+      if cluster_id == "":
+        temp1 = Utilities.get_storage_policy(self.yamldoc["spec"].get("ephemeral_storage_policy"), self.vcip, self.token_header)
+        if not temp1:
+          logging.error("wcpCluster/" + self.cluster + " check value for ephemeral_storage_policy")
           sys.exit(-1)
-      elif cluster > 0:
-        logging.warning("wcpCluster/" + self.cluster + " not compatiable")
-      else:
-        logging.error("wcpCluster/" + self.cluster + " failed check")
-        sys.exit(-1)
-  
-  def delete(self):
-    # delete wcpCluster
-    if self.objtype == "wcpCluster":
-      logging.info("Found {} type in yaml, proceeding to delete".format(__class__.__name__))
+        temp2 = Utilities.get_storage_policy(self.yamldoc["spec"].get("master_storage_policy"), self.vcip, self.token_header)
+        if not temp2:
+          logging.error("wcpCluster/" + self.cluster + " check value for master_storage_policy")
+          sys.exit(-1)
+        temp3 = Utilities.get_storage_policy(self.yamldoc["spec"]["image_storage"].get("storage_policy"), self.vcip, self.token_header)
+        if not temp3:
+          logging.error("wcpCluster/" + self.cluster + " check value for storage_policy")
+          sys.exit(-1)
+        temp4,err = Utilities.get_content_library(self.yamldoc["spec"].get("default_kubernetes_service_content_library"), self.vcip, self.token_header)
+        if err != 0:
+          logging.error("wcpCluster/{self.cluster} failed to find default content library")
+          sys.exit(-1)
+        elif not temp4:
+          logging.error ("wcpCluster/"+self.cluster+" check value for default_kubernetes_service_content_library")
+          sys.exit(-1)
+        temp5 = Utilities.get_mgmt_network(self.yamldoc["spec"]["master_management_network"].get("network"), self.datacenter_id, self.vcip, self.token_header)  
+        if not temp5:
+          logging.error("wcpCluster/" + self.cluster + " check value for master_management_network - network")
+          sys.exit(-1)
 
-      cluster = Utilities.check_wcp_cluster_status(self.cluster_id, self.vcip, self.token_header)
-      if cluster > 0:
-        # Check if you want to delete ???
-        json_response = self.session.post('https://'+self.vcip+'/api/vcenter/namespace-management/clusters/'+self.cluster_id+'?action=disable', headers=self.token_header)
-        if json_response.ok:
-            logging.info("wcpCluster/" + self.cluster + " delete initiated")
+        #Process for NSX config
+        if self.yamldoc["spec"]["network_provider"] == "NSXT_CONTAINER_PLUGIN":
+          temp6 = Utilities.get_nsx_switch(self.cluster_id, self.vcip, self.token_header)
+          if not temp6:
+            logging.error("wcpCluster/" + self.cluster + " no compatiable NSX switch for cluster")
+            sys.exit(-1)
+          temp7 = Utilities.get_nsx_edge_cluster(self.cluster_id, temp6, self.vcip, self.token_header)
+          if not temp7:
+            logging.error("wcpCluster/" + self.cluster + " no compatiable NSX edge cluster")
+            sys.exit(-1)
+          self.yamldoc["spec"]["ncp_cluster_network_spec"].update({"cluster_distributed_switch": temp6})
+          self.yamldoc["spec"]["ncp_cluster_network_spec"].update({"nsx_edge_cluster": temp7})
+
+        # Process BYO LB
         else:
-            logging.error("wcpCluster/" + self.cluster + " delete failed")
-            logging.error(json_response.text)
-      elif cluster == 0:
-        logging.warning("wcpCluster/" + self.cluster + " not operational")
-      else:
-        logging.error("wcpCluster/" + self.cluster + " failed status check")
-        sys.exit(-1)
-
-  def apply(self):
-    # apply wcpCluster
-    if self.objtype == "wcpCluster":
-      logging.info("Found {} type in yaml, proceeding to apply".format(__class__.__name__))
-
-      del self.yamldoc["kind"]
-      del self.yamldoc["metadata"]
-      cluster = Utilities.check_wcp_cluster_compatibility(self.cluster_id, self.yamldoc["spec"]["network_provider"], self.skip_compat, self.vcip, self.token_header)
-      if cluster > 0:
-
-        cluster_id = Utilities.check_wcp_cluster_status(self.cluster_id, self.vcip, self.token_header)
-        if cluster_id == 0:
-          logging.info("WCP Cluster not found, creating...")
-          temp1 = Utilities.get_storage_policy(self.yamldoc["spec"].get("ephemeral_storage_policy"), self.vcip, self.token_header)
-          temp2 = Utilities.get_storage_policy(self.yamldoc["spec"].get("master_storage_policy"), self.vcip, self.token_header)
-          temp3 = Utilities.get_storage_policy(self.yamldoc["spec"]["image_storage"].get("storage_policy"), self.vcip, self.token_header)
-          temp4 = Utilities.get_content_library(self.yamldoc["spec"].get("default_kubernetes_service_content_library"), self.vcip, self.token_header)
-          temp5 = Utilities.get_mgmt_network(self.yamldoc["spec"]["master_management_network"].get("network"), self.datacenter_id, self.vcip, self.token_header)  
-          if not temp5:
+          temp6 = Utilities.get_mgmt_network(self.yamldoc["spec"]["workload_networks_spec"]["supervisor_primary_workload_network"]["vsphere_network"].get("portgroup"), self.datacenter_id, self.vcip, self.token_header)
+          if not temp6:
             logging.error("wcpCluster/" + self.cluster + " check value for master_management_network - network")
             sys.exit(-1)
+          self.yamldoc["spec"]["workload_networks_spec"]["supervisor_primary_workload_network"]["vsphere_network"].update({"portgroup": temp6})
 
-          #Process for NSX config
-          if self.yamldoc["spec"]["network_provider"] == "NSXT_CONTAINER_PLUGIN":
-            temp6 = Utilities.get_nsx_switch(self.cluster_id, self.vcip, self.token_header)
-            if not temp6:
-              logging.error("wcpCluster/" + self.cluster + " no compatiable NSX switch for cluster")
-              sys.exit(-1)
-            temp7 = Utilities.get_nsx_edge_cluster(self.cluster_id, temp6, self.vcip, self.token_header)
-            if not temp7:
-              logging.error("wcpCluster/" + self.cluster + " no compatiable NSX edge cluster")
-              sys.exit(-1)
-            self.yamldoc["spec"]["ncp_cluster_network_spec"].update({"cluster_distributed_switch": temp6})
-            self.yamldoc["spec"]["ncp_cluster_network_spec"].update({"nsx_edge_cluster": temp7})
-
-          # Process BYO LB
-          else:
-            temp6 = Utilities.get_mgmt_network(self.yamldoc["spec"]["workload_networks_spec"]["supervisor_primary_workload_network"]["vsphere_network"].get("portgroup"), self.datacenter_id, self.vcip, self.token_header)
-            if not temp6:
-              logging.error("wcpCluster/" + self.cluster + " check value for master_management_network - network")
-              sys.exit(-1)
-            self.yamldoc["spec"]["workload_networks_spec"]["supervisor_primary_workload_network"]["vsphere_network"].update({"portgroup": temp6})
-
-          # Update any of the above is 0 then quit
-
+          # Update ...if any of the above is 0 then quit
           self.yamldoc["spec"].update({"ephemeral_storage_policy": temp1})
           self.yamldoc["spec"].update({"master_storage_policy": temp2})
           self.yamldoc["spec"]["image_storage"].update({"storage_policy": temp3})
@@ -179,15 +97,103 @@ class wcpCluster(CommandBase): # class name is looked up dynamically
           else:
             logging.error("wcpCluster/" + self.cluster + " creation failed")
             logging.error(json_response.text)
-        elif cluster_id > 0:
-          logging.warning ("wcpCluster/"+self.cluster+" already operational at https://"+Utilities.check_wcp_cluster_status(self.cluster_id), self.vcip)
-        else:
-          logging.error("wcpCluster/"+self.cluster+" status failure")
-          sys.exit(-1)
-      elif cluster == 0:
-        logging.warning("wcpCluster/" + self.cluster + " not compatiable")
+            sys.exit(-1)
       else:
-        logging.error("wcpCluster/" + self.cluster + " status failure")
+        url,err = Utilities.check_wcp_cluster_status(self.cluster_id, self.vcip, self.token_header)
+        logging.warning(f"wcpCluster/"+self.cluster+" already operational at https://{url}")
+  
+  def delete(self):
+    # delete wcpCluster
+    if self.objtype == "wcpCluster":
+      logging.info("Found {} type in yaml, proceeding to delete".format(__class__.__name__))
+
+      cluster,err = Utilities.check_wcp_cluster_status(self.cluster_id, self.vcip, self.token_header)
+      if err != 0:
+        logging.error("wcpCluster/" + self.cluster + " failed status check")
+        sys.exit(-1)
+
+      if cluster:
+        # Check if you want to delete ???
+        json_response = self.session.post('https://'+self.vcip+'/api/vcenter/namespace-management/clusters/'+self.cluster_id+'?action=disable', headers=self.token_header)
+        if json_response.ok:
+            logging.info("wcpCluster/" + self.cluster + " delete initiated")
+        else:
+            logging.error("wcpCluster/" + self.cluster + " delete failed")
+            logging.error(json_response.text)
+            sys.exit(-1)
+      else:
+        logging.warning("wcpCluster/" + self.cluster + " not operational")
+
+  def apply(self):
+    # apply wcpCluster
+    if self.objtype == "wcpCluster":
+      logging.info("Found {} type in yaml, proceeding to apply".format(__class__.__name__))
+
+      del self.yamldoc["kind"]
+      del self.yamldoc["metadata"]
+
+      # not reliable
+      # cluster = Utilities.check_wcp_cluster_compatibility(self.cluster_id, self.yamldoc["spec"]["network_provider"], self.skip_compat, self.vcip, self.token_header)
+      # if cluster > 0:
+
+      cluster_id,err = Utilities.check_wcp_cluster_status(self.cluster_id, self.vcip, self.token_header)
+      if err != 0:
+        logging.error("wcpCluster/"+self.cluster+" status failure")
+        sys.exit(-1)
+
+      if cluster_id:
+        logging.info("WCP Cluster not found, creating...")
+        temp1 = Utilities.get_storage_policy(self.yamldoc["spec"].get("ephemeral_storage_policy"), self.vcip, self.token_header)
+        temp2 = Utilities.get_storage_policy(self.yamldoc["spec"].get("master_storage_policy"), self.vcip, self.token_header)
+        temp3 = Utilities.get_storage_policy(self.yamldoc["spec"]["image_storage"].get("storage_policy"), self.vcip, self.token_header)
+        temp4,err = Utilities.get_content_library(self.yamldoc["spec"].get("default_kubernetes_service_content_library"), self.vcip, self.token_header)
+        if err != 0:
+          logging.error("wcpCluster/{self.cluster} failed to find default content library")
+          sys.exit(-1)
+        temp5 = Utilities.get_mgmt_network(self.yamldoc["spec"]["master_management_network"].get("network"), self.datacenter_id, self.vcip, self.token_header)  
+        if not temp5:
+          logging.error("wcpCluster/" + self.cluster + " check value for master_management_network - network")
+          sys.exit(-1)
+
+        #Process for NSX config
+        if self.yamldoc["spec"]["network_provider"] == "NSXT_CONTAINER_PLUGIN":
+          temp6 = Utilities.get_nsx_switch(self.cluster_id, self.vcip, self.token_header)
+          if not temp6:
+            logging.error("wcpCluster/" + self.cluster + " no compatiable NSX switch for cluster")
+            sys.exit(-1)
+          temp7 = Utilities.get_nsx_edge_cluster(self.cluster_id, temp6, self.vcip, self.token_header)
+          if not temp7:
+            logging.error("wcpCluster/" + self.cluster + " no compatiable NSX edge cluster")
+            sys.exit(-1)
+          self.yamldoc["spec"]["ncp_cluster_network_spec"].update({"cluster_distributed_switch": temp6})
+          self.yamldoc["spec"]["ncp_cluster_network_spec"].update({"nsx_edge_cluster": temp7})
+
+        # Process BYO LB
+        else:
+          temp6 = Utilities.get_mgmt_network(self.yamldoc["spec"]["workload_networks_spec"]["supervisor_primary_workload_network"]["vsphere_network"].get("portgroup"), self.datacenter_id, self.vcip, self.token_header)
+          if not temp6:
+            logging.error("wcpCluster/" + self.cluster + " check value for master_management_network - network")
+            sys.exit(-1)
+          self.yamldoc["spec"]["workload_networks_spec"]["supervisor_primary_workload_network"]["vsphere_network"].update({"portgroup": temp6})
+
+        # Update any of the above is 0 then quit
+        self.yamldoc["spec"].update({"ephemeral_storage_policy": temp1})
+        self.yamldoc["spec"].update({"master_storage_policy": temp2})
+        self.yamldoc["spec"]["image_storage"].update({"storage_policy": temp3})
+        self.yamldoc["spec"].update({"default_kubernetes_service_content_library": temp4})
+        self.yamldoc["spec"]["master_management_network"].update({"network": temp5})
+
+        json_payload = json.loads(json.dumps(self.yamldoc["spec"]))
+        json_response = self.session.post('https://'+self.vcip+'/api/vcenter/namespace-management/clusters/'+self.cluster_id+'?action=enable', headers=self.token_header,json=json_payload)
+        if json_response.ok:
+          logging.info("wcpCluster/" + self.cluster + " creation started")
+        else:
+          logging.error("wcpCluster/" + self.cluster + " creation failed")
+          logging.error(json_response.text)
+          sys.exit(-1)
+      else:
+        logging.warning ("wcpCluster/"+self.cluster+" already operational at https://"+Utilities.check_wcp_cluster_status(self.cluster_id), self.vcip)
+
 
       # TO DO : stub to patch server
       #   json_response = s.patch('https://'+self.vcip+'/api/vcenter/namespace-management/clusters/'+self.cluster_id, headers=self.token_header,json=json_payload)
@@ -210,8 +216,12 @@ class wcpCluster(CommandBase): # class name is looked up dynamically
     if self.objtype == "wcpCluster":
       logging.info("Found {} type in yaml, proceeding to describe".format(__class__.__name__))
 
-      cluster_id = Utilities.check_wcp_cluster_status(self.cluster_id, self.vcip, self.token_header)
-      if cluster_id > 0:
+      cluster_id,err = Utilities.check_wcp_cluster_status(self.cluster_id, self.vcip, self.token_header)
+      if err != 0:
+        logging.error("wcpCluster/" + self.cluster + " failed status check")
+        sys.exit(-1)
+        
+      if cluster_id:
         json_response = self.session.get('https://'+self.vcip+'/api/vcenter/namespace-management/clusters/'+self.cluster_id, headers=self.token_header)
         if json_response.ok:
           result = json.loads(json_response.text)
@@ -220,8 +230,5 @@ class wcpCluster(CommandBase): # class name is looked up dynamically
           logging.error("wcpCluster/" + self.cluster + " describe failed")
           logging.error(json_response.text)
           sys.exit(-1)
-      elif cluster_id == 0:
+      elif cluster_id == "":
         logging.warning("wcpCluster/" + self.cluster + " not ready")
-      else:
-        logging.error("wcpCluster/" + self.cluster + " failed status check")
-        sys.exit(-1)

@@ -35,8 +35,8 @@ class Utilities:
         if result["name"] == storage_name:
             return result["datastore"]
     else:
-      return -1
-    return 0
+      return "-1"
+    return ""
 
   @staticmethod
   def get_storage_policy(sp_name: str, vcip: str, token_header: str):
@@ -49,11 +49,10 @@ class Utilities:
       for result in results:
         if result["name"] == sp_name:
           return result["policy"]
-        else:
-          return 0
     else:
-      return -1
+      return ""
 
+  @staticmethod
   def get_content_library(cl_name: str, vcip: str, token_header: str):
     s = requests.Session()
     s.verify = False
@@ -66,10 +65,11 @@ class Utilities:
         if json_response.ok:
           cl_library = json.loads(json_response.text)["value"]
           if cl_library["name"] == cl_name:
-            return cl_library["id"]
+            return cl_library["id"],0
+        else:
+          return "",0
     else:
-      return -1
-    return 0
+      return "",-1
 
   @staticmethod
   def get_nsx_switch(cluster: str, vcip: str, token_header: str):
@@ -110,8 +110,7 @@ class Utilities:
         if result["name"] == mgmt_nw_name:
             return result["network"]
     else:
-      return -1
-    return 0
+      return ""
 
   @staticmethod
   def check_wcp_cluster_compatibility(cluster: str, net_p: str , skip_compat: str, vcip: str, token_header: str):
@@ -142,11 +141,13 @@ class Utilities:
       result = json.loads(json_response.text)
       if result["config_status"] == "RUNNING":
         if result["kubernetes_status"] == "READY":
-            return result["api_server_cluster_endpoint"]
+            return result["api_server_cluster_endpoint"],0
       else:
-        return 0
+        return "",0
     else:
-      return -1
+      if (json_response.status_code == 400) and ("does not have Workloads enabled" in json_response.text):
+        return "",0
+      return "",-1
 
   @staticmethod
   def check_wcp_harbor_status(cluster: str, vcip: str, token_header: str):
@@ -197,5 +198,7 @@ class Utilities:
         return 1
       else:
         return 0
+    elif "vcenter.wcp.workload.notfound" in json_response.text:
+      return 0
     else:
       return -1
