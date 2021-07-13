@@ -29,7 +29,7 @@ class wcpContentLibrary(CommandBase): # class name is looked up dynamically
       contentlibrary_id,err = Utilities.get_content_library(self.yamldoc["spec"].get("name"), self.vcip, self.token_header)
       if err != 0:
         logging.error("wcpContentLibrary/content_library failed to fetch status")
-        sys.exit(-1)
+        raise Exception('Error')
       if contentlibrary_id == "":
         del self.yamldoc["kind"]
         del self.yamldoc["metadata"]
@@ -43,7 +43,7 @@ class wcpContentLibrary(CommandBase): # class name is looked up dynamically
             self.yamldoc["spec"]["storage_backings"][i].update({"datastore_id": temp1})
           else:
             logging.error("wcpContentLibrary invalid storage name specified")
-            sys.exit(-1)
+            raise Exception('Error')
           i = i + 1
 
         self.yamldoc["create_spec"] = self.yamldoc.pop("spec")
@@ -54,7 +54,7 @@ class wcpContentLibrary(CommandBase): # class name is looked up dynamically
         else:
           logging.error("wcpContentLibrary/library creation failed")
           logging.error(json_response.text)
-          sys.exit(-1)
+          raise Exception('Error')
       elif contentlibrary_id != "":
         logging.info("wcpContentLibrary/library already running")
 
@@ -67,7 +67,7 @@ class wcpContentLibrary(CommandBase): # class name is looked up dynamically
       contentlibrary_id,err = Utilities.get_content_library(self.yamldoc["spec"].get("name"), self.vcip,self.token_header)
       if err != 0:
         logging.error("wcpContentLibrary/content_library failed to fetch status")
-        sys.exit(-1)
+        raise Exception('Error')
 
       if contentlibrary_id:
         json_response = self.session.delete('https://'+self.vcip+'/rest/com/vmware/content/local-library/id:'+contentlibrary_id,headers=self.token_header)
@@ -77,14 +77,14 @@ class wcpContentLibrary(CommandBase): # class name is looked up dynamically
           logging.error("wcpContentLibrary/library deletion failed")
           result = json.loads(json_response.text)
           logging.error(json.dumps(result, indent=2, sort_keys=True))
-          sys.exit(-1)
+          raise Exception('Error')
       elif contentlibrary_id == "":
         logging.warning("wcpContentLibrary/Subscribed library not found")
 
   def apply(self):
     # this method is broken
     logging.error("This apply method is currently unsupported for this type")
-    sys.exit(-1)
+    raise Exception('Error')
     
     # apply wcpContentLibrary
     if self.objtype == "wcpContentLibrary":
@@ -93,7 +93,7 @@ class wcpContentLibrary(CommandBase): # class name is looked up dynamically
       contentlibrary_id,err = Utilities.get_content_library(self.yamldoc["spec"].get("name"), self.vcip, self.token_header)
       if err != 0:
         logging.error("wcpContentLibrary/content_library failed to fetch status")
-        sys.exit(-1)
+        raise Exception('Error')
         
       if not contentlibrary_id:
         del self.yamldoc["kind"]
@@ -121,7 +121,7 @@ class wcpContentLibrary(CommandBase): # class name is looked up dynamically
         else:
           logging.error("wcpContentLibrary/Subscribed_library apply failed")
           logging.error(json_response.text)
-          sys.exit(-1)
+          raise Exception('Error')
       elif contentlibrary_id:
         logging.warning("wcpContentLibrary/Subscribed_library already running")
 
@@ -133,7 +133,7 @@ class wcpContentLibrary(CommandBase): # class name is looked up dynamically
       contentlibrary_id,err = Utilities.get_content_library_id(self.args.name, self.vcip, self.token_header)
       if err != 0:
         logging.error(f"wcpContentLibrary/{self.args.name} could not be found")
-        sys.exit(-1)
+        raise Exception('Error')
     
       if contentlibrary_id:
         cl,err = Utilities.get_content_library(contentlibrary_id, self.vcip, self.token_header)
@@ -143,4 +143,4 @@ class wcpContentLibrary(CommandBase): # class name is looked up dynamically
         else:
           logging.error("wcpContentLibrary/library error describing")
           logging.error(f"Response Body: {cl}")
-          sys.exit(-1)
+          raise Exception('Error')

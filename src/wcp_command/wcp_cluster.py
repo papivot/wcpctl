@@ -35,43 +35,43 @@ class wcpCluster(CommandBase): # class name is looked up dynamically
       cluster_id, err = Utilities.check_wcp_cluster_status(self.cluster_id, self.vcip, self.token_header)
       if err != 0:
         logging.error("wcpCluster/"+self.cluster+" failed status check")
-        sys.exit(-1)
+        raise Exception('Error')
 
       if cluster_id == "":
         temp1 = Utilities.get_storage_policy(self.yamldoc["spec"].get("ephemeral_storage_policy"), self.vcip, self.token_header)
         if not temp1:
           logging.error("wcpCluster/" + self.cluster + " check value for ephemeral_storage_policy")
-          sys.exit(-1)
+          raise Exception('Error')
         temp2 = Utilities.get_storage_policy(self.yamldoc["spec"].get("master_storage_policy"), self.vcip, self.token_header)
         if not temp2:
           logging.error("wcpCluster/" + self.cluster + " check value for master_storage_policy")
-          sys.exit(-1)
+          raise Exception('Error')
         temp3 = Utilities.get_storage_policy(self.yamldoc["spec"]["image_storage"].get("storage_policy"), self.vcip, self.token_header)
         if not temp3:
           logging.error("wcpCluster/" + self.cluster + " check value for storage_policy")
-          sys.exit(-1)
+          raise Exception('Error')
         temp4,err = Utilities.get_content_library(self.yamldoc["spec"].get("default_kubernetes_service_content_library"), self.vcip, self.token_header)
         if err != 0:
           logging.error("wcpCluster/{self.cluster} failed to find default content library")
-          sys.exit(-1)
+          raise Exception('Error')
         elif not temp4:
           logging.error ("wcpCluster/"+self.cluster+" check value for default_kubernetes_service_content_library")
-          sys.exit(-1)
+          raise Exception('Error')
         temp5 = Utilities.get_mgmt_network(self.yamldoc["spec"]["master_management_network"].get("network"), self.datacenter_id, self.vcip, self.token_header)  
         if not temp5:
           logging.error("wcpCluster/" + self.cluster + " check value for master_management_network - network")
-          sys.exit(-1)
+          raise Exception('Error')
 
         #Process for NSX config
         if self.yamldoc["spec"]["network_provider"] == "NSXT_CONTAINER_PLUGIN":
           temp6 = Utilities.get_nsx_switch(self.cluster_id, self.vcip, self.token_header)
           if not temp6:
             logging.error("wcpCluster/" + self.cluster + " no compatiable NSX switch for cluster")
-            sys.exit(-1)
+            raise Exception('Error')
           temp7 = Utilities.get_nsx_edge_cluster(self.cluster_id, temp6, self.vcip, self.token_header)
           if not temp7:
             logging.error("wcpCluster/" + self.cluster + " no compatiable NSX edge cluster")
-            sys.exit(-1)
+            raise Exception('Error')
           self.yamldoc["spec"]["ncp_cluster_network_spec"].update({"cluster_distributed_switch": temp6})
           self.yamldoc["spec"]["ncp_cluster_network_spec"].update({"nsx_edge_cluster": temp7})
 
@@ -80,7 +80,7 @@ class wcpCluster(CommandBase): # class name is looked up dynamically
           temp6 = Utilities.get_mgmt_network(self.yamldoc["spec"]["workload_networks_spec"]["supervisor_primary_workload_network"]["vsphere_network"].get("portgroup"), self.datacenter_id, self.vcip, self.token_header)
           if not temp6:
             logging.error("wcpCluster/" + self.cluster + " check value for master_management_network - network")
-            sys.exit(-1)
+            raise Exception('Error')
           self.yamldoc["spec"]["workload_networks_spec"]["supervisor_primary_workload_network"]["vsphere_network"].update({"portgroup": temp6})
 
           # Update ...if any of the above is 0 then quit
@@ -97,7 +97,7 @@ class wcpCluster(CommandBase): # class name is looked up dynamically
           else:
             logging.error("wcpCluster/" + self.cluster + " creation failed")
             logging.error(json_response.text)
-            sys.exit(-1)
+            raise Exception('Error')
       else:
         url,err = Utilities.check_wcp_cluster_status(self.cluster_id, self.vcip, self.token_header)
         logging.warning(f"wcpCluster/"+self.cluster+" already operational at https://{url}")
@@ -110,7 +110,7 @@ class wcpCluster(CommandBase): # class name is looked up dynamically
       cluster,err = Utilities.check_wcp_cluster_status(self.cluster_id, self.vcip, self.token_header)
       if err != 0:
         logging.error("wcpCluster/" + self.cluster + " failed status check")
-        sys.exit(-1)
+        raise Exception('Error')
 
       if cluster:
         # Check if you want to delete ???
@@ -120,7 +120,7 @@ class wcpCluster(CommandBase): # class name is looked up dynamically
         else:
             logging.error("wcpCluster/" + self.cluster + " delete failed")
             logging.error(json_response.text)
-            sys.exit(-1)
+            raise Exception('Error')
       else:
         logging.warning("wcpCluster/" + self.cluster + " not operational")
 
@@ -139,7 +139,7 @@ class wcpCluster(CommandBase): # class name is looked up dynamically
       cluster_id,err = Utilities.check_wcp_cluster_status(self.cluster_id, self.vcip, self.token_header)
       if err != 0:
         logging.error("wcpCluster/"+self.cluster+" status failure")
-        sys.exit(-1)
+        raise Exception('Error')
 
       if cluster_id:
         logging.info("WCP Cluster not found, creating...")
@@ -149,22 +149,22 @@ class wcpCluster(CommandBase): # class name is looked up dynamically
         temp4,err = Utilities.get_content_library(self.yamldoc["spec"].get("default_kubernetes_service_content_library"), self.vcip, self.token_header)
         if err != 0:
           logging.error("wcpCluster/{self.cluster} failed to find default content library")
-          sys.exit(-1)
+          raise Exception('Error')
         temp5 = Utilities.get_mgmt_network(self.yamldoc["spec"]["master_management_network"].get("network"), self.datacenter_id, self.vcip, self.token_header)  
         if not temp5:
           logging.error("wcpCluster/" + self.cluster + " check value for master_management_network - network")
-          sys.exit(-1)
+          raise Exception('Error')
 
         #Process for NSX config
         if self.yamldoc["spec"]["network_provider"] == "NSXT_CONTAINER_PLUGIN":
           temp6 = Utilities.get_nsx_switch(self.cluster_id, self.vcip, self.token_header)
           if not temp6:
             logging.error("wcpCluster/" + self.cluster + " no compatiable NSX switch for cluster")
-            sys.exit(-1)
+            raise Exception('Error')
           temp7 = Utilities.get_nsx_edge_cluster(self.cluster_id, temp6, self.vcip, self.token_header)
           if not temp7:
             logging.error("wcpCluster/" + self.cluster + " no compatiable NSX edge cluster")
-            sys.exit(-1)
+            raise Exception('Error')
           self.yamldoc["spec"]["ncp_cluster_network_spec"].update({"cluster_distributed_switch": temp6})
           self.yamldoc["spec"]["ncp_cluster_network_spec"].update({"nsx_edge_cluster": temp7})
 
@@ -173,7 +173,7 @@ class wcpCluster(CommandBase): # class name is looked up dynamically
           temp6 = Utilities.get_mgmt_network(self.yamldoc["spec"]["workload_networks_spec"]["supervisor_primary_workload_network"]["vsphere_network"].get("portgroup"), self.datacenter_id, self.vcip, self.token_header)
           if not temp6:
             logging.error("wcpCluster/" + self.cluster + " check value for master_management_network - network")
-            sys.exit(-1)
+            raise Exception('Error')
           self.yamldoc["spec"]["workload_networks_spec"]["supervisor_primary_workload_network"]["vsphere_network"].update({"portgroup": temp6})
 
         # Update any of the above is 0 then quit
@@ -190,7 +190,7 @@ class wcpCluster(CommandBase): # class name is looked up dynamically
         else:
           logging.error("wcpCluster/" + self.cluster + " creation failed")
           logging.error(json_response.text)
-          sys.exit(-1)
+          raise Exception('Error')
       else:
         logging.warning ("wcpCluster/"+self.cluster+" already operational at https://"+Utilities.check_wcp_cluster_status(self.cluster_id), self.vcip)
 
@@ -219,12 +219,12 @@ class wcpCluster(CommandBase): # class name is looked up dynamically
       cluster_name, err = Utilities.get_wcp_cluster_id(self.args.name, self.vcip, self.token_header)
       if err != 0:
         logging.error("wcpCluster/" + self.args.name + " could not be found")
-        sys.exit(-1)
+        raise Exception('Error')
 
       cluster_id,err = Utilities.check_wcp_cluster_status(cluster_name, self.vcip, self.token_header)
       if err != 0:
         logging.error("wcpCluster/" + self.args.name + " failed status check")
-        sys.exit(-1)
+        raise Exception('Error')
         
       if cluster_id:
         json_response = self.session.get('https://'+self.vcip+'/api/vcenter/namespace-management/clusters/'+cluster_name, headers=self.token_header)
@@ -235,6 +235,6 @@ class wcpCluster(CommandBase): # class name is looked up dynamically
         else:
           logging.error("wcpCluster/" + self.args.name + " describe failed")
           logging.error(json_response.text)
-          sys.exit(-1)
+          raise Exception('Error')
       elif cluster_id == "":
         logging.warning("wcpCluster/" + self.args.name+ " not ready")

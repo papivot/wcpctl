@@ -38,7 +38,7 @@ class wcpNamespace(CommandBase): # class name is looked up dynamically
             self.spec["storage_specs"][i].update({"policy": temp1})
           else:
             logging.error("wcpNamespace/" + self.spec["namespace"] + " invalid storage policy specified")
-            sys.exit(-1)
+            raise Exception('Error')
           i = i + 1
 
         json_payload = json.loads(json.dumps(self.spec))
@@ -52,7 +52,7 @@ class wcpNamespace(CommandBase): # class name is looked up dynamically
         logging.warning("wcpNamespace/" + self.spec["namespace"] + " already exists. No changes made")
       else:
         logging.error("wcpNamespace failed to create")
-        sys.exit(-1)
+        raise Exception('Error')
 
   def delete(self):
     # delete wcpNamespace
@@ -65,7 +65,7 @@ class wcpNamespace(CommandBase): # class name is looked up dynamically
       else:
         logging.error("wcpNamespace/" + self.spec["namespace"] + " deletion failed")
         logging.error(json_response.text)
-        sys.exit(-1)
+        raise Exception('Error')
 
   def apply(self):
     # apply wcpNamespace
@@ -84,7 +84,7 @@ class wcpNamespace(CommandBase): # class name is looked up dynamically
             self.spec["storage_specs"][i].update({"policy": temp1})
           else:
             logging.error("wcpNamespace/" + self.spec["namespace"] + " invalid storage policy specified")
-            sys.exit(-1)
+            raise Exception('Error')
           i = i + 1
 
         json_payload = json.loads(json.dumps(self.spec))
@@ -106,7 +106,7 @@ class wcpNamespace(CommandBase): # class name is looked up dynamically
             self.spec["storage_specs"][i].update({"policy": temp1})
           else:
             logging.error("wcpNamespace/" + self.spec["namespace"] + " invalid storage policy specified")
-            sys.exit(-1)
+            raise Exception('Error')
           i = i + 1
 
         json_payload = json.loads(json.dumps(self.spec))
@@ -116,7 +116,7 @@ class wcpNamespace(CommandBase): # class name is looked up dynamically
         else:
           logging.error("wcpNamespace/" + self.spec["namespace"] + " creation failed")
           logging.error(json_response.text)
-          sys.exit(-1)
+          raise Exception('Error')
       else:
         logging.error("Failed to get status on wcpNamespace/{}".format(self.spec["namespace"]))
 
@@ -128,11 +128,11 @@ class wcpNamespace(CommandBase): # class name is looked up dynamically
       namespace,err = Utilities.get_wcp_ns(self.args.name, self.vcip, self.token_header)
       if err != 0:
         logging.error(f"There was an error describing WCP Namespace {self.args.name}")
-        sys.exit(-1)
+        raise Exception('Error')
 
       if namespace == "":
         logging.error(f"WCP Namespace {self.args.name} was not found")
-        sys.exit(-1)
+        raise Exception('Error')
 
       logging.info(namespace)
       print(namespace)

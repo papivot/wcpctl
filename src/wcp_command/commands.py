@@ -116,6 +116,7 @@ class Command:
       obj_instance.create()
     except:
       logging.exception("There was an error when creating object")
+      raise Exception("Caught create exception")
       
     # end the open session
     if self.objtype.find("test") != 0:
@@ -131,6 +132,7 @@ class Command:
       obj_instance.delete()
     except:
       logging.exception("There was an error when deleting object")
+      raise Exception("Caught delete exception")
 
     # end the open session
     if self.objtype.find("test") != 0:
@@ -146,6 +148,7 @@ class Command:
       obj_instance.apply()
     except:
       logging.exception("There was an error when applying object")
+      raise Exception("Caught apply exception")
   
     # end the open session
     if self.objtype.find("test") != 0:
@@ -161,6 +164,7 @@ class Command:
       obj_instance.describe()
     except:
       logging.exception("There was an error when describing object")
+      raise Exception("Caught describe exception")
   
     # end the open session
     if self.objtype.find("test") != 0:
