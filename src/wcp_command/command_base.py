@@ -17,7 +17,7 @@ import requests
 class CommandBase:
 
   # constructor to handle the common values
-  def __init__(self, args, yamldoc, token_header, cluster_id, skip_compat, datacenter_id, session: requests.session):
+  def __init__(self, args, yamldoc, token_header, cluster_id, skip_compat, datacenter_id, session: requests.session, vcip, objtype):
     # get params
     self.args = args
     self.yamldoc = yamldoc
@@ -26,13 +26,14 @@ class CommandBase:
     self.skip_compat = skip_compat
     self.datacenter_id = datacenter_id
     self.session = session
+    self.vcip = vcip
+    self.objtype = objtype
 
     # get derived objects
-    self.objtype = self.yamldoc["kind"]
-    self.vcip = self.yamldoc["metadata"]["vcenter"]
-    self.datacenter = self.yamldoc["metadata"]["datacenter"]
-    self.cluster = self.yamldoc["metadata"]["cluster"]
-    self.spec = self.yamldoc["spec"]
+    if (args.verb != 'describe'):
+      self.datacenter = self.yamldoc["metadata"]["datacenter"]
+      self.cluster = self.yamldoc["metadata"]["cluster"]
+      self.spec = self.yamldoc["spec"]
 
   def create(self):
     raise ImplementationError("This method is not currently implemented!")

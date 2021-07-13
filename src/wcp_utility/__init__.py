@@ -51,24 +51,42 @@ class Utilities:
           return result["policy"]
     else:
       return ""
+  
 
   @staticmethod
-  def get_content_library(cl_name: str, vcip: str, token_header: str):
+  def get_content_library_id(cl_name: str, vcip: str, token_header: str):
     s = requests.Session()
     s.verify = False
 
-    json_response = s.get('https://' + vcip + '/rest/com/vmware/content/library', headers=token_header)
+    logging.debug("Getting ContentLibrary")
+    json_response = s.get('https://' + vcip + '/api/content/library', headers=token_header)
     if json_response.ok:
-      results = json.loads(json_response.text)["value"]
+      logging.debug(f"Got Valid response: {json_response.text}")
+      results = json.loads(json_response.text)
       for result in results:
-        json_response = s.get('https://' + vcip + '/rest/com/vmware/content/library/id:' + result, headers=token_header)
+        json_response = s.get('https://' + vcip + '/api/content/library/' + result, headers=token_header)
         if json_response.ok:
-          cl_library = json.loads(json_response.text)["value"]
+          cl_library = json.loads(json_response.text)
           if cl_library["name"] == cl_name:
-            return cl_library["id"],0
-        else:
-          return "",0
+            return result,0
+      # if we got here, there's no library detected
+      return "",0
     else:
+      return "",-1
+
+  @staticmethod
+  def get_content_library(cl_id: str, vcip: str, token_header: str):
+    s = requests.Session()
+    s.verify = False
+
+    logging.debug("Getting ContentLibrary")
+    json_response = s.get('https://' + vcip + '/api/content/library/' + cl_id, headers=token_header)
+    if json_response.ok:
+      results = json.loads(json_response.text)
+      return results,0
+    else:
+      logging.error(f"HTTP code: {json_response.status_code}")
+      logging.error(f"Could not find ContentLibrary: {cl_id}")
       return "",-1
 
   @staticmethod
@@ -132,6 +150,24 @@ class Utilities:
         return -1
 
   @staticmethod
+  def get_wcp_cluster_id(cluster: str, vcip: str, token_header: str):
+    s = requests.Session()
+    s.verify = False
+    json_response = s.get('https://' + vcip + '/api/vcenter/namespace-management/clusters', headers=token_header)
+    if json_response.ok:
+      results = json.loads(json_response.text)
+      for result in results:
+        if result["cluster_name"] == cluster:
+          logging.debug(f"Found {cluster} as {result['cluster']}")
+          return result['cluster'],0
+      logging.error(f"Could not find WCP Cluster named {cluster}")
+    else:
+      if (json_response.status_code == 400) and ("does not have Workloads enabled" in json_response.text):
+        return "",0
+      return "",-1
+
+
+  @staticmethod
   def check_wcp_cluster_status(cluster: str, vcip: str, token_header: str):
     s = requests.Session()
     s.verify = False
@@ -185,6 +221,20 @@ class Utilities:
         return 0
     else:
       return -1
+
+  @staticmethod
+  def get_wcp_ns(ns_name: str, vcip: str, token_header: str):
+    s = requests.Session()
+    s.verify = False
+
+    json_response = s.get('https://' + vcip + '/api/vcenter/namespaces/instances/' + ns_name, headers=token_header)
+    if json_response.ok:
+      result = json.loads(json_response.text)
+      return result,0
+    elif "vcenter.wcp.namespace.notfound" in json_response.text:
+      return "",0
+    else:
+      return "",-1
 
   @staticmethod
   def check_wcp_ns_status(ns_name: str, vcip: str, token_header: str):

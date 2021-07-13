@@ -26,11 +26,11 @@ class wcpContentLibrary(CommandBase): # class name is looked up dynamically
     if self.objtype == "wcpContentLibrary":
       logging.info("Found {} type in yaml, proceeding to create".format(__class__.__name__))
 
-      contentlibrary_id,err = Utilities.get_content_library(self.yamldoc["spec"].get("name"), self.vcip,headers=self.token_header)
+      contentlibrary_id,err = Utilities.get_content_library(self.yamldoc["spec"].get("name"), self.vcip, self.token_header)
       if err != 0:
         logging.error("wcpContentLibrary/content_library failed to fetch status")
         sys.exit(-1)
-      if contentlibrary_id:
+      if contentlibrary_id == "":
         del self.yamldoc["kind"]
         del self.yamldoc["metadata"]
         client_token = Utilities.generate_random_uuid()
@@ -48,7 +48,6 @@ class wcpContentLibrary(CommandBase): # class name is looked up dynamically
 
         self.yamldoc["create_spec"] = self.yamldoc.pop("spec")
         json_payload = json.loads(json.dumps(self.yamldoc))
-        self.headers.update({'vmware-api-session-id': self.token})
         json_response = self.session.post('https://'+self.vcip+'/rest/com/vmware/content/local-library',headers=self.token_header,json=json_payload)
         if json_response.ok:
           logging.info("wcpContentLibrary/library created")
@@ -56,7 +55,7 @@ class wcpContentLibrary(CommandBase): # class name is looked up dynamically
           logging.error("wcpContentLibrary/library creation failed")
           logging.error(json_response.text)
           sys.exit(-1)
-      elif contentlibrary_id == "":
+      elif contentlibrary_id != "":
         logging.info("wcpContentLibrary/library already running")
 
 
@@ -83,6 +82,10 @@ class wcpContentLibrary(CommandBase): # class name is looked up dynamically
         logging.warning("wcpContentLibrary/Subscribed library not found")
 
   def apply(self):
+    # this method is broken
+    logging.error("This apply method is currently unsupported for this type")
+    sys.exit(-1)
+    
     # apply wcpContentLibrary
     if self.objtype == "wcpContentLibrary":
       logging.info("Found {} type in yaml, proceeding to create".format(__class__.__name__))
@@ -98,6 +101,7 @@ class wcpContentLibrary(CommandBase): # class name is looked up dynamically
         client_token = Utilities.generate_random_uuid()
         self.yamldoc.update({"client_token": client_token})
 
+      # TODO
       # i = 0
       # for sb in self.yamldoc["spec"]["storage_backings"]:
       # # ????
@@ -124,24 +128,19 @@ class wcpContentLibrary(CommandBase): # class name is looked up dynamically
   def describe(self):
     # describe wcpContentLibrary
     if self.objtype == "wcpContentLibrary":
-      logging.info("Found {} type in yaml, proceeding to describe".format(__class__.__name__))
+      logging.info(f"Found {__class__.__name__} type in request, proceeding to describe")
 
-      contentlibrary_id,err = Utilities.get_content_library(self.yamldoc["spec"].get("name"), self.vcip, self.token_header)
+      contentlibrary_id,err = Utilities.get_content_library_id(self.args.name, self.vcip, self.token_header)
       if err != 0:
-        logging.error("wcpContentLibrary/content_library failed to fetch status")
+        logging.error(f"wcpContentLibrary/{self.args.name} could not be found")
         sys.exit(-1)
     
       if contentlibrary_id:
-        # TODO HYUUUGE assumption here regarding local vs subscribed libs, need to consider what air-gapped solution might look like
-        json_response = self.session.get('https://'+self.vcip+'/rest/com/vmware/content/local-library/id:'+contentlibrary_id,headers=self.token_header)
-        if (json_response.ok):
-          result = json.loads(json_response.text)
-          logging.info(json.dumps(result, indent=2, sort_keys=True))
+        cl,err = Utilities.get_content_library(contentlibrary_id, self.vcip, self.token_header)
+        if (err == 0):
+          logging.info(json.dumps(cl, indent=2, sort_keys=True))
+          print(json.dumps(cl, indent=2, sort_keys=True))
         else:
-          logging.error("HTTP code: {}".format(json_response.status_code))
           logging.error("wcpContentLibrary/library error describing")
-          logging.error(json_response.text)
+          logging.error(f"Response Body: {cl}")
           sys.exit(-1)
-      else:
-        logging.error("wcpContentLibrary/library was not found")
-        sys.exit(-1)

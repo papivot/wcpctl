@@ -23,6 +23,8 @@ import logging
 def build_parser():
   parser = argparse.ArgumentParser(description='wcpctl controls for managing Supervisor Clusters in vSphere 7 with K8s. Uses YAML configuration files to setup and manage the Supervisor Cluster. Find additional information at: https://github.io/papivot/wcpctl')
   parser.add_argument('--version', action='version',version='%(prog)s v0.3')
+  parser.add_argument('-s', action='store_true', dest='silent', help='Output Logging to file')
+  parser.add_argument('-v', action='store_true', dest='verbose', help='Verbose mode')
   subparsers = parser.add_subparsers(help='Commands',dest='verb')
 
   # A create command
@@ -40,17 +42,24 @@ def build_parser():
   delete_parser.add_argument('filename', action='store', help='YAML file with WCP object configuration. See examples for help')
   delete_parser.add_argument('-u', action="store", dest="userid", help='VCenter userid. If not provided, will default to administrator@vsphere.local')
 
-  # A delete command
+  # A describe command
   describe_parser = subparsers.add_parser('describe', help='Describe a WCP object(s)')
-  describe_parser.add_argument('filename', action='store', help='YAML file with WCP metadata info. See examples for help')
+  # describe_parser.add_argument('filename', action='store', help='YAML file with WCP metadata info. See examples for help')
   describe_parser.add_argument('-u', action="store", dest="userid", help='VCenter userid. If not provided, will default to administrator@vsphere.local')
+
+  describe_type_subparser = describe_parser.add_subparsers(help='Types',dest='type')
+  describe_type_parser = describe_type_subparser.add_parser('wcpCluster', help='wcpCluster Object')
+  describe_type_parser.add_argument('name', action="store", help="Name of the resource to describe")
+  describe_type_parser = describe_type_subparser.add_parser('wcpContentLibrary', help='wcpContentLibrary Object')
+  describe_type_parser.add_argument('name', action="store", help="Name of the resource to describe")
+  describe_type_parser = describe_type_subparser.add_parser('wcpNamespace', help='wcpNamespace Object')
+  describe_type_parser.add_argument('name', action="store", help="Name of the resource to describe")
+  describe_type_parser = describe_type_subparser.add_parser('wcpRegistry', help='wcpRegistry Object')
+  describe_type_parser.add_argument('name', action="store", help="Name of the resource to describe")
 
   return parser
 
-if __name__ == "__main__":
-  # Logging config
-  logging.basicConfig(format='[%(asctime)s]:[%(levelname)s]:  %(message)s',level=logging.DEBUG)
-  
+if __name__ == "__main__":  
   # configure requests
   from requests.packages.urllib3.exceptions import InsecureRequestWarning
   requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -61,18 +70,41 @@ if __name__ == "__main__":
   # parse incoming args
   cmd = parser.parse_args()
 
-  # for every yaml, run the command
-  with open(cmd.filename, ) as f:
-    # load all yamls into list of maps
-    yamldocs = yaml.load_all(f, Loader=yaml.FullLoader)
-    for yamldoc in yamldocs:
-      # create command object
-      command = Command(cmd, yamldoc)
+  # determine log level
+  if cmd.verbose is True:
+    log_level = logging.DEBUG
+  else:
+    log_level = logging.WARNING
 
-      # find sub-command verb (ie. create, describe, delete, apply)
-      verb = getattr(command, cmd.verb)
+  # Logging config
+  if (cmd.silent is True):
+    logging.basicConfig(format='[%(asctime)s]:[%(levelname)s]:  %(message)s',level=log_level, filename='/tmp/wcpctl.log')
+  else:
+    logging.basicConfig(format='[%(asctime)s]:[%(levelname)s]:  %(message)s',level=log_level)
 
-      # run sub-command
-      verb()
-  
+  if cmd.verb == "describe":
+    # call alternate constructure for Command
+    command = Command(cmd, None)
+
+    # find sub-command verb (ie. create, describe, delete, apply)
+    verb = getattr(command, cmd.verb)
+
+    # run sub-command
+    verb()
+
+  else:
+    # for every yaml, run the command
+    with open(cmd.filename, ) as f:
+      # load all yamls into list of maps
+      yamldocs = yaml.load_all(f, Loader=yaml.FullLoader)
+      for yamldoc in yamldocs:
+        # create command object
+        command = Command(cmd, yamldoc)
+
+        # find sub-command verb (ie. create, describe, delete, apply)
+        verb = getattr(command, cmd.verb)
+
+        # run sub-command
+        verb()
+    
 

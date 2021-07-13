@@ -123,20 +123,16 @@ class wcpNamespace(CommandBase): # class name is looked up dynamically
   def describe(self):
     # describe wcpNamespace
     if self.objtype == "wcpNamespace":
-      logging.info("Found {} type in yaml, proceeding to describe".format(__class__.__name__))
+      logging.info(f"Found {__class__.__name__} type in request, proceeding to describe")
 
-      json_response = self.session.get('https://' + self.vcip + '/api/vcenter/namespaces/instances',headers=self.token_header)
-      if (json_response.ok):
-        results = json.loads(json_response.text)
-        for result in results:
-          if result["cluster"] == self.cluster_id:
-            json_response = self.session.get('https://'+self.vcip+'/api/vcenter/namespaces/instances/'+result["namespace"],headers=self.token_header)
-            if (json_response.ok):
-              nsresult = json.loads(json_response.text)
-              logging.info(json.dumps(nsresult, indent=2, sort_keys=True))
-            else:
-              logging.error("wcpNamespace" + result["namespace"] + " error describing")
-      else:
-        logging.error("wcpNamespace error describing: {} code: {}".format(self.spec["namespace"], json_response.status_code))
-        logging.error("wcpNamespace error response: {}".format(json_response.raw))
+      namespace,err = Utilities.get_wcp_ns(self.args.name, self.vcip, self.token_header)
+      if err != 0:
+        logging.error(f"There was an error describing WCP Namespace {self.args.name}")
         sys.exit(-1)
+
+      if namespace == "":
+        logging.error(f"WCP Namespace {self.args.name} was not found")
+        sys.exit(-1)
+
+      logging.info(namespace)
+      print(namespace)

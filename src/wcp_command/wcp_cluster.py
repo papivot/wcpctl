@@ -214,21 +214,27 @@ class wcpCluster(CommandBase): # class name is looked up dynamically
   def describe(self):
     # describe wcpCluster
     if self.objtype == "wcpCluster":
-      logging.info("Found {} type in yaml, proceeding to describe".format(__class__.__name__))
+      logging.info(f"Found {__class__.__name__} type in request, proceeding to describe")
 
-      cluster_id,err = Utilities.check_wcp_cluster_status(self.cluster_id, self.vcip, self.token_header)
+      cluster_name, err = Utilities.get_wcp_cluster_id(self.args.name, self.vcip, self.token_header)
       if err != 0:
-        logging.error("wcpCluster/" + self.cluster + " failed status check")
+        logging.error("wcpCluster/" + self.args.name + " could not be found")
+        sys.exit(-1)
+
+      cluster_id,err = Utilities.check_wcp_cluster_status(cluster_name, self.vcip, self.token_header)
+      if err != 0:
+        logging.error("wcpCluster/" + self.args.name + " failed status check")
         sys.exit(-1)
         
       if cluster_id:
-        json_response = self.session.get('https://'+self.vcip+'/api/vcenter/namespace-management/clusters/'+self.cluster_id, headers=self.token_header)
+        json_response = self.session.get('https://'+self.vcip+'/api/vcenter/namespace-management/clusters/'+cluster_name, headers=self.token_header)
         if json_response.ok:
           result = json.loads(json_response.text)
           logging.info(json.dumps(result, indent=2, sort_keys=True))
+          print(json.dumps(result, indent=2, sort_keys=True))
         else:
-          logging.error("wcpCluster/" + self.cluster + " describe failed")
+          logging.error("wcpCluster/" + self.args.name + " describe failed")
           logging.error(json_response.text)
           sys.exit(-1)
       elif cluster_id == "":
-        logging.warning("wcpCluster/" + self.cluster + " not ready")
+        logging.warning("wcpCluster/" + self.args.name+ " not ready")
