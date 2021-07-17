@@ -130,17 +130,11 @@ class wcpContentLibrary(CommandBase): # class name is looked up dynamically
     if self.objtype == "wcpContentLibrary":
       logging.info(f"Found {__class__.__name__} type in request, proceeding to describe")
 
-      contentlibrary_id,err = Utilities.get_content_library_id(self.args.name, self.vcip, self.token_header)
-      if err != 0:
-        logging.error(f"wcpContentLibrary/{self.args.name} could not be found")
+      cl,err = Utilities.get_content_library(self.args.name, self.vcip, self.token_header)
+      if (err == 0):
+        logging.info(json.dumps(cl, indent=2, sort_keys=True))
+        print(json.dumps(cl, indent=2, sort_keys=True))
+      else:
+        logging.error("wcpContentLibrary/library error describing")
+        logging.error(f"Response Body: {cl}")
         raise Exception('Error')
-    
-      if contentlibrary_id:
-        cl,err = Utilities.get_content_library(contentlibrary_id, self.vcip, self.token_header)
-        if (err == 0):
-          logging.info(json.dumps(cl, indent=2, sort_keys=True))
-          print(json.dumps(cl, indent=2, sort_keys=True))
-        else:
-          logging.error("wcpContentLibrary/library error describing")
-          logging.error(f"Response Body: {cl}")
-          raise Exception('Error')

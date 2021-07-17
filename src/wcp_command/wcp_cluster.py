@@ -14,6 +14,7 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import json
+import yaml
 import logging
 import sys
 from wcp_utility import *
@@ -26,6 +27,7 @@ class wcpCluster(CommandBase): # class name is looked up dynamically
     if self.objtype == "wcpCluster":
 
       logging.info("Found {} type in yaml, proceeding to create".format(__class__.__name__))
+      logging.debug(f"Found yaml:\n{yaml.dump(self.yamldoc)}")
       del self.yamldoc["kind"]
       del self.yamldoc["metadata"]
 
@@ -50,9 +52,9 @@ class wcpCluster(CommandBase): # class name is looked up dynamically
         if not temp3:
           logging.error("wcpCluster/" + self.cluster + " check value for storage_policy")
           raise Exception('Error')
-        temp4,err = Utilities.get_content_library(self.yamldoc["spec"].get("default_kubernetes_service_content_library"), self.vcip, self.token_header)
+        temp4,err = Utilities.get_content_library_id(self.yamldoc["spec"].get("default_kubernetes_service_content_library"), self.vcip, self.token_header)
         if err != 0:
-          logging.error("wcpCluster/{self.cluster} failed to find default content library")
+          logging.error(f"wcpCluster/{self.cluster} failed to find default content library {self.yamldoc['spec'].get('default_kubernetes_service_content_library')}")
           raise Exception('Error')
         elif not temp4:
           logging.error ("wcpCluster/"+self.cluster+" check value for default_kubernetes_service_content_library")

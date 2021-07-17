@@ -79,15 +79,28 @@ class Utilities:
     s = requests.Session()
     s.verify = False
 
-    logging.debug("Getting ContentLibrary")
-    json_response = s.get('https://' + vcip + '/api/content/library/' + cl_id, headers=token_header)
-    if json_response.ok:
-      results = json.loads(json_response.text)
-      return results,0
-    else:
+    logging.debug("Getting All ContentLibrary objects")
+    json_response = s.get('https://' + vcip + '/api/content/library', headers=token_header)
+    if not json_response.ok:
       logging.error(f"HTTP code: {json_response.status_code}")
-      logging.error(f"Could not find ContentLibrary: {cl_id}")
+      logging.error("Content Library query failed")
       return "",-1
+
+    results = json.loads(json_response.text)
+    for result in results:
+      json_response = s.get('https://' + vcip + '/api/content/library/' + result, headers=token_header)
+      if not json_response.ok:
+        logging.error(f"HTTP code: {json_response.status_code}")
+        logging.error(f"Content Library query for library id {result} failed")
+        return "",-1
+
+      library = json.loads(json_response.text)
+      if library['name'] == cl_id:
+        logging.debug(f"Found {cl_id} content library to be {result}")
+        return library,0
+    
+    logging.error(f"Could not find library matching {cl_id}")
+    return "",-1
 
   @staticmethod
   def get_nsx_switch(cluster: str, vcip: str, token_header: str):
